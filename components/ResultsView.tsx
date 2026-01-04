@@ -32,7 +32,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
   const handleExportPDF = () => {
     const oldTitle = document.title;
     const dateStr = new Date().toLocaleDateString(language === 'pt' ? 'pt-BR' : 'en-US').replace(/\//g, '-');
-    document.title = `Relatorio_FinCasal_${dateStr}`;
+    document.title = `Relatorio_FinControl_${dateStr}`;
     setTimeout(() => {
       window.print();
       document.title = oldTitle;
@@ -51,7 +51,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
             {language === 'pt' ? 'Resultados' : 'Results'}
           </h1>
           <p className={`font-bold mt-2 ${textContrast}`}>
-            {language === 'pt' ? 'Análise detalhada do desempenho do casal.' : 'Detailed analysis of the couple\'s performance.'}
+            {language === 'pt' ? 'Análise detalhada do seu desempenho financeiro.' : 'Detailed analysis of your financial performance.'}
           </p>
         </div>
         <div className="flex gap-3 no-print">

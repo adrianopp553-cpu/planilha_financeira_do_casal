@@ -6,7 +6,6 @@ import SummaryCards from './components/SummaryCards';
 import TransactionForm from './components/TransactionForm';
 import TransactionTable from './components/TransactionTable';
 
-// Carregamento Preguiçoso apenas para componentes pesados de verdade
 const FinancialCharts = lazy(() => import('./components/FinancialCharts'));
 const AIAssistant = lazy(() => import('./components/AIAssistant'));
 const ResultsView = lazy(() => import('./components/ResultsView'));
@@ -15,32 +14,46 @@ const SettingsView = lazy(() => import('./components/SettingsView'));
 const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
-      </filter>
+      <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="currentColor" />
+        <stop offset="100%" stopColor="currentColor" stopOpacity="0.6" />
+      </linearGradient>
     </defs>
-    <g style={{ filter: 'url(#logoGlow)' }}>
-      <path d="M10 75C25 70 35 45 50 50C65 55 75 35 85 30L90 18L78 24L83 31C75 38 65 58 50 53C35 48 25 73 10 78V75Z" fill="currentColor" fillOpacity="0.4" />
-      <path d="M10 75C25 70 35 45 50 50C65 55 75 35 85 30" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-      <path d="M85 30L78 35L90 18L93 30L85 30Z" fill="currentColor" />
-    </g>
-    <path d="M50 92L43.5 86C18 64.5 4 52.5 4 37C4 24.5 13.5 15 26 15C33.5 15 40.5 18.5 45 24C49.5 18.5 56.5 15 64 15C76.5 15 86 24.5 86 37C86 52.5 72 64.5 46.5 86L50 92Z" stroke="currentColor" strokeWidth="6" strokeLinejoin="round" />
-    <path d="M28 38H44V43H34V48H42V53H34V65H28V38Z" fill="currentColor" />
-    <path d="M72 45C72 41 69 38 65 38H55C51 38 48 41 48 45V58C48 62 51 65 55 65H65C69 65 72 62 72 58V55H66V59H54V42H66V46H72V45Z" fill="currentColor" />
+    {/* Background geométrico moderno */}
+    <rect x="15" y="15" width="70" height="70" rx="18" fill="url(#logoGrad)" fillOpacity="0.1" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
+    
+    {/* Letra F */}
+    <path 
+      d="M32 35 H 58 V 42 H 40 V 48 H 55 V 55 H 40 V 70 H 32 V 35 Z" 
+      fill="currentColor" 
+    />
+    
+    {/* Letra C interligada */}
+    <path 
+      d="M62 38 C 72 38, 78 45, 78 55 C 78 65, 72 72, 62 72 M 62 48 C 68 48, 70 52, 70 55 C 70 58, 68 62, 62 62" 
+      stroke="currentColor" 
+      strokeWidth="6" 
+      strokeLinecap="round" 
+      fill="none"
+    />
   </svg>
 );
 
 const ViewLoader = () => (
-  <div className="min-h-[50vh] flex flex-col items-center justify-center gap-6 animate-in fade-in duration-500">
-    <div className="w-12 h-12 border-4 border-theme/20 border-t-theme rounded-full animate-spin"></div>
-    <div className="text-center">
-      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-theme/60 mb-2">Sincronizando Galáxia Financeira...</p>
-      <div className="w-48 h-1 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
-        <div className="h-full bg-theme animate-[progress_2s_infinite_linear]"></div>
+  <div className="min-h-[60vh] flex flex-col items-center justify-center gap-8 animate-in fade-in duration-700">
+    <div className="relative">
+      <div className="w-16 h-16 border-4 border-theme/10 border-t-theme rounded-full animate-spin"></div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-2 h-2 bg-theme rounded-full animate-ping"></div>
       </div>
     </div>
-    <style>{`@keyframes progress { 0% { width: 0%; } 50% { width: 70%; } 100% { width: 100%; } }`}</style>
+    <div className="text-center">
+      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-theme mb-3">FinControl Pro</p>
+      <div className="w-40 h-1 bg-gray-200 dark:bg-white/5 rounded-full overflow-hidden">
+        <div className="h-full bg-theme animate-[progress_1.5s_infinite_ease-in-out]"></div>
+      </div>
+    </div>
+    <style>{`@keyframes progress { 0% { width: 0%; transform: translateX(-100%); } 50% { width: 60%; transform: translateX(50%); } 100% { width: 100%; transform: translateX(100%); } }`}</style>
   </div>
 );
 
@@ -62,8 +75,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const loadSaved = () => {
-      const savedData = localStorage.getItem('fincasal_data');
-      const savedSettings = localStorage.getItem('fincasal_settings');
+      const savedData = localStorage.getItem('fincontrol_data');
+      const savedSettings = localStorage.getItem('fincontrol_settings');
       if (savedData) try { setTransactions(JSON.parse(savedData)); } catch (e) { console.error(e); }
       if (savedSettings) try { setSettings(prev => ({...prev, ...JSON.parse(savedSettings)})); } catch (e) { console.error(e); }
       setIsLoaded(true);
@@ -73,8 +86,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('fincasal_data', JSON.stringify(transactions));
-      localStorage.setItem('fincasal_settings', JSON.stringify(settings));
+      localStorage.setItem('fincontrol_data', JSON.stringify(transactions));
+      localStorage.setItem('fincontrol_settings', JSON.stringify(settings));
       
       const root = document.documentElement;
       const fontMap = { 
@@ -104,49 +117,62 @@ const App: React.FC = () => {
 
   if (!isLoaded) return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black gap-6">
-      <FCLogo className="w-16 h-16 text-indigo-500 animate-pulse" />
-      <p className="text-theme font-black italic tracking-[0.5em] text-xs uppercase">FINCASAL PRO...</p>
+      <FCLogo className="w-20 h-20 text-indigo-500 animate-pulse" />
+      <p className="text-theme font-black tracking-[0.6em] text-[10px] uppercase opacity-50">Iniciando Core Engine...</p>
     </div>
   );
 
   return (
-    <div className="min-h-screen flex flex-col relative z-10" style={{ fontFamily: 'var(--app-font)' }}>
-      <nav className="fixed top-0 w-full z-50 border-b border-black/5 dark:border-white/10 bg-white/70 dark:bg-black/40 backdrop-blur-3xl transition-all duration-500 no-print">
+    <div className="min-h-screen flex flex-col relative z-10 selection:bg-theme selection:text-white" style={{ fontFamily: 'var(--app-font)' }}>
+      {/* Navbar Minimalista */}
+      <nav className="fixed top-0 w-full z-50 border-b border-black/5 dark:border-white/10 bg-white/60 dark:bg-black/40 backdrop-blur-3xl transition-all duration-500 no-print">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigateTo('home')}>
-            <div className="w-12 h-12 bg-theme rounded-[16px] flex items-center justify-center shadow-lg shadow-theme/30 transition-all group-hover:scale-110 group-hover:rotate-3">
-              <FCLogo className="h-8 w-8 text-white" />
+          <div className="flex items-center gap-4 cursor-pointer group" onClick={() => navigateTo('home')}>
+            <div className="w-12 h-12 bg-theme/10 rounded-2xl flex items-center justify-center shadow-inner border border-theme/20 transition-all group-hover:scale-105 group-hover:-rotate-3">
+              <FCLogo className="h-8 w-8 text-theme" />
             </div>
-            <span className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tighter">Fin<span className="text-theme">Casal</span></span>
+            <span className="text-2xl font-black text-gray-900 dark:text-white tracking-tighter">Fin<span className="text-theme">Control</span></span>
           </div>
-          <div className="hidden md:flex items-center gap-1 p-1 bg-gray-200/50 dark:bg-white/5 rounded-[20px] border border-black/5 dark:border-white/10">
-            <button onClick={() => navigateTo('home')} className={`px-6 py-2.5 rounded-[16px] text-[11px] font-black uppercase tracking-widest transition-all ${view === 'home' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-xl' : 'text-gray-500 dark:text-white/60'}`}>{t.dashboard}</button>
-            <button onClick={() => navigateTo('results')} className={`px-6 py-2.5 rounded-[16px] text-[11px] font-black uppercase tracking-widest transition-all ${view === 'results' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-xl' : 'text-gray-500 dark:text-white/60'}`}>{t.results}</button>
-            <button onClick={() => navigateTo('settings')} className={`p-2.5 rounded-[16px] transition-all ${view === 'settings' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-xl' : 'text-gray-500 dark:text-white/60'}`}><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /></svg></button>
+          
+          <div className="hidden md:flex items-center gap-2 p-1.5 bg-gray-100 dark:bg-white/5 rounded-3xl border border-black/5 dark:border-white/10">
+            <button onClick={() => navigateTo('home')} className={`px-8 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${view === 'home' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-2xl' : 'text-gray-500 dark:text-white/40 hover:text-theme'}`}>{t.dashboard}</button>
+            <button onClick={() => navigateTo('results')} className={`px-8 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${view === 'results' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-2xl' : 'text-gray-500 dark:text-white/40 hover:text-theme'}`}>{t.results}</button>
+            <button onClick={() => navigateTo('settings')} className={`p-2.5 rounded-2xl transition-all ${view === 'settings' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-2xl' : 'text-gray-500 dark:text-white/40 hover:text-theme'}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /></svg>
+            </button>
           </div>
         </div>
       </nav>
 
-      <div className="flex-1 pb-24 md:pb-0 min-h-screen">
+      <div className="flex-1 min-h-screen">
         <Suspense fallback={<ViewLoader />}>
           {view === 'home' ? (
             <div className="animate-in fade-in duration-1000">
-              <section className="pt-48 pb-24 px-6 text-center relative">
-                <h1 className="text-5xl md:text-8xl font-black text-gray-900 dark:text-white mb-8 tracking-tighter leading-[0.95]">
+              {/* Hero Section */}
+              <section className="pt-48 pb-32 px-6 text-center relative overflow-hidden">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-theme/5 rounded-full blur-[160px] pointer-events-none opacity-50 animate-pulse"></div>
+                <h1 className="text-6xl md:text-9xl font-black text-gray-900 dark:text-white mb-10 tracking-tighter leading-[0.9] perspective-1000">
                   {t.harmony} <br />
-                  <span className="text-theme" style={{ filter: 'drop-shadow(0 0 15px var(--primary-shadow))' }}>{t.relationship}</span>
+                  <span className="text-theme inline-block hover:scale-105 transition-transform cursor-default" style={{ filter: 'drop-shadow(0 0 20px var(--primary-shadow))' }}>
+                    {t.relationship}
+                  </span>
                 </h1>
-                <p className="text-xl text-gray-600 dark:text-white/80 max-w-2xl mx-auto mb-14 font-medium leading-relaxed">{t.subtitle}</p>
-                <button onClick={() => document.getElementById('dash-content')?.scrollIntoView({ behavior: 'smooth' })} className="px-14 py-7 bg-theme text-white font-black uppercase tracking-widest text-xs rounded-full shadow-2xl shadow-theme/40 hover:scale-105 active:scale-95 transition-all duration-500">{t.startPlanning}</button>
+                <p className="text-xl md:text-2xl text-gray-500 dark:text-white/60 max-w-3xl mx-auto mb-16 font-medium leading-relaxed italic">{t.subtitle}</p>
+                <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+                  <button onClick={() => document.getElementById('dash-content')?.scrollIntoView({ behavior: 'smooth' })} className="w-full md:w-auto px-16 py-7 bg-theme text-white font-black uppercase tracking-widest text-xs rounded-3xl shadow-2xl shadow-theme/40 hover:brightness-110 active:scale-95 transition-all duration-500">{t.startPlanning}</button>
+                  <button onClick={() => navigateTo('results')} className="w-full md:w-auto px-16 py-7 bg-white dark:bg-white/5 text-gray-900 dark:text-white font-black uppercase tracking-widest text-xs rounded-3xl border border-black/5 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 transition-all">{t.results}</button>
+                </div>
               </section>
 
-              <main id="dash-content" className="max-w-7xl mx-auto px-6 pb-32 scroll-mt-28 relative z-10">
+              <main id="dash-content" className="max-w-7xl mx-auto px-6 pb-40 scroll-mt-24 relative z-10">
                 <SummaryCards summary={summary} language={settings.language} />
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mt-12">
-                  <div className="lg:col-span-8 space-y-12">
-                    <Suspense fallback={<div className="h-40 bg-gray-100 dark:bg-white/5 rounded-[40px] animate-pulse"></div>}>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mt-16">
+                  <div className="lg:col-span-8 space-y-16">
+                    <Suspense fallback={<div className="h-64 bg-gray-100 dark:bg-white/5 rounded-[48px] animate-pulse"></div>}>
                       <AIAssistant transactions={transactions} language={settings.language} />
                     </Suspense>
+                    
                     <div id="new-transaction-section">
                       <TransactionForm 
                         onAdd={(tx) => setTransactions(prev => [tx, ...prev])} 
@@ -156,6 +182,7 @@ const App: React.FC = () => {
                         language={settings.language}
                       />
                     </div>
+                    
                     <TransactionTable 
                       transactions={transactions} 
                       onDelete={(id) => setTransactions(prev => prev.filter(t => t.id !== id))}
@@ -163,9 +190,11 @@ const App: React.FC = () => {
                       language={settings.language}
                     />
                   </div>
-                  <div className="lg:col-span-4">
-                    <div className="bg-white dark:bg-black/30 p-8 rounded-[40px] shadow-sm border border-black/5 dark:border-white/10 sticky top-28 backdrop-blur-3xl">
-                      <Suspense fallback={<div className="h-64 flex items-center justify-center text-xs text-theme/40 font-black uppercase tracking-widest">Calculando Gráficos...</div>}>
+                  
+                  <div className="lg:col-span-4 sticky top-24">
+                    <div className="bg-white/80 dark:bg-black/30 p-10 rounded-[48px] shadow-2xl border border-black/5 dark:border-white/10 backdrop-blur-3xl">
+                      <h3 className="text-xs font-black uppercase tracking-[0.3em] text-theme mb-8 border-b border-theme/10 pb-4">Visão de Fluxo</h3>
+                      <Suspense fallback={<div className="h-64 flex flex-col items-center justify-center gap-4 text-[10px] text-theme/40 font-black uppercase tracking-widest"><div className="w-8 h-8 border-2 border-theme/20 border-t-theme rounded-full animate-spin"></div>Calculando...</div>}>
                         <FinancialCharts transactions={transactions} language={settings.language} />
                       </Suspense>
                     </div>
@@ -176,21 +205,38 @@ const App: React.FC = () => {
           ) : view === 'results' ? (
             <ResultsView transactions={transactions} summary={summary} onBack={() => navigateTo('home')} language={settings.language} lightMode={settings.lightMode} />
           ) : (
-            <SettingsView settings={settings} onUpdate={setSettings} onBack={() => navigateTo('home')} language={settings.language} />
+            <SettingsView settings={settings} onUpdate={setSettings} onBack={() => navigateTo('home')} language={settings.language} summary={summary} transactions={transactions} />
           )}
         </Suspense>
       </div>
 
-      <footer className="bg-gray-50/50 dark:bg-black/40 border-t border-black/5 dark:border-white/10 py-20 px-6 no-print">
-        <div className="max-w-7xl mx-auto border-t border-black/5 dark:border-white/10 pt-10 text-center">
-          <p className="text-[11px] text-gray-400 dark:text-white/20 font-black uppercase tracking-[0.5em]">© 2025 FINCASAL. STELLAR FINANCIAL MANAGEMENT.</p>
+      <footer className="bg-gray-50/50 dark:bg-black/40 border-t border-black/5 dark:border-white/10 py-24 px-6 no-print">
+        <div className="max-w-7xl mx-auto text-center space-y-8">
+          <div className="flex items-center justify-center gap-4">
+            <FCLogo className="h-10 w-10 text-theme" />
+            <span className="text-xl font-black tracking-tighter">FinControl <span className="text-theme">Pro</span></span>
+          </div>
+          <p className="text-[10px] text-gray-400 dark:text-white/20 font-black uppercase tracking-[0.6em] max-w-sm mx-auto leading-relaxed italic">Engineered for absolute financial sovereignty. v2.5.0 Premium</p>
+          <div className="pt-8 border-t border-black/5 dark:border-white/5">
+            <p className="text-[9px] text-gray-300 dark:text-white/10 font-bold uppercase tracking-widest">© 2025 STARK INDUSTRIES FINANCIAL DIV.</p>
+          </div>
         </div>
       </footer>
       
-      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-white/80 dark:bg-black/60 backdrop-blur-3xl rounded-full border border-black/5 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.4)] z-50 py-4 flex items-center justify-around no-print">
-        <button onClick={() => navigateTo('home')} className={`flex flex-col items-center gap-1.5 ${view === 'home' ? 'text-theme' : 'text-gray-400'}`}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span className="text-[9px] font-black uppercase tracking-widest">{t.dashboard}</span></button>
-        <button onClick={() => navigateTo('results')} className={`flex flex-col items-center gap-1.5 ${view === 'results' ? 'text-theme' : 'text-gray-400'}`}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg><span className="text-[9px] font-black uppercase tracking-widest">Análise</span></button>
-        <button onClick={() => navigateTo('settings')} className={`flex flex-col items-center gap-1.5 ${view === 'settings' ? 'text-theme' : 'text-gray-400'}`}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg><span className="text-[9px] font-black uppercase tracking-widest">Ajustes</span></button>
+      {/* Mobile Nav */}
+      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] bg-white/90 dark:bg-black/80 backdrop-blur-3xl rounded-[32px] border border-black/5 dark:border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.3)] z-50 py-5 flex items-center justify-around no-print">
+        <button onClick={() => navigateTo('home')} className={`flex flex-col items-center gap-2 transition-all ${view === 'home' ? 'text-theme scale-110' : 'text-gray-400'}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+          <span className="text-[8px] font-black uppercase tracking-widest">{t.dashboard}</span>
+        </button>
+        <button onClick={() => navigateTo('results')} className={`flex flex-col items-center gap-2 transition-all ${view === 'results' ? 'text-theme scale-110' : 'text-gray-400'}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+          <span className="text-[8px] font-black uppercase tracking-widest">{t.results}</span>
+        </button>
+        <button onClick={() => navigateTo('settings')} className={`flex flex-col items-center gap-2 transition-all ${view === 'settings' ? 'text-theme scale-110' : 'text-gray-400'}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+          <span className="text-[8px] font-black uppercase tracking-widest">Ajustes</span>
+        </button>
       </div>
     </div>
   );

@@ -1,16 +1,47 @@
 
 import React, { useRef } from 'react';
-import { AppSettings } from '../types';
+import { AppSettings, FinancialSummary, Transaction } from '../types';
 import { translations } from '../translations';
+
+// Fix: Added missing FCLogo component definition to resolve reference error
+const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
+  <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="currentColor" />
+        <stop offset="100%" stopColor="currentColor" stopOpacity="0.6" />
+      </linearGradient>
+    </defs>
+    {/* Background geométrico moderno */}
+    <rect x="15" y="15" width="70" height="70" rx="18" fill="url(#logoGrad)" fillOpacity="0.1" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
+    
+    {/* Letra F */}
+    <path 
+      d="M32 35 H 58 V 42 H 40 V 48 H 55 V 55 H 40 V 70 H 32 V 35 Z" 
+      fill="currentColor" 
+    />
+    
+    {/* Letra C interligada */}
+    <path 
+      d="M62 38 C 72 38, 78 45, 78 55 C 78 65, 72 72, 62 72 M 62 48 C 68 48, 70 52, 70 55 C 70 58, 68 62, 62 62" 
+      stroke="currentColor" 
+      strokeWidth="6" 
+      strokeLinecap="round" 
+      fill="none"
+    />
+  </svg>
+);
 
 interface SettingsViewProps {
   settings: AppSettings;
   onUpdate: (settings: AppSettings) => void;
   onBack: () => void;
   language: 'pt' | 'en' | 'es';
+  summary?: FinancialSummary;
+  transactions?: Transaction[];
 }
 
-const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack, language }) => {
+const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack, language, summary, transactions = [] }) => {
   const t = translations[language];
   const fileInputRef = useRef<HTMLInputElement>(null);
   const updateSetting = (key: keyof AppSettings, value: any) => onUpdate({ ...settings, [key]: value });
@@ -19,24 +50,32 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
   const labelColor = !settings.lightMode ? 'text-slate-300' : 'text-slate-700';
   const secondaryLabelColor = !settings.lightMode ? 'text-slate-500' : 'text-slate-400';
 
+  const formatCurrency = (val: number) => 
+    new Intl.NumberFormat(language === 'pt' ? 'pt-BR' : 'en-US', { 
+      style: 'currency', 
+      currency: language === 'pt' ? 'BRL' : 'USD' 
+    }).format(val);
+
   const handleExportData = () => {
     const data = {
-      transactions: JSON.parse(localStorage.getItem('fincasal_data') || '[]'),
+      transactions: JSON.parse(localStorage.getItem('fincontrol_data') || '[]'),
       settings: settings
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `fincasal_backup_${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `fincontrol_backup_${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     URL.revokeObjectURL(url);
   };
 
   const handleExportPDF = () => {
-    // Redireciona para a vista de resultados e dispara o print (simulado via navegação interna se necessário)
-    // Para esta implementação, como o PDF é visual, informamos ao usuário para usar a aba Resultados ou abrimos o modo de impressão
+    const oldTitle = document.title;
+    const dateStr = new Date().toLocaleDateString(language === 'pt' ? 'pt-BR' : 'en-US').replace(/\//g, '-');
+    document.title = `FinControl_Report_${dateStr}`;
     window.print();
+    document.title = oldTitle;
   };
 
   const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,15 +87,15 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
       try {
         const content = JSON.parse(e.target?.result as string);
         if (content.transactions) {
-          localStorage.setItem('fincasal_data', JSON.stringify(content.transactions));
+          localStorage.setItem('fincontrol_data', JSON.stringify(content.transactions));
           if (content.settings) {
             onUpdate(content.settings);
           }
-          alert(language === 'pt' ? '✅ Dados importados com sucesso! Recarregando...' : '✅ Data imported successfully! Reloading...');
+          alert(language === 'pt' ? '✅ Backup Restaurado com Sucesso!' : '✅ Backup Restored Successfully!');
           window.location.reload();
         }
       } catch (err) {
-        alert(language === 'pt' ? '❌ Erro ao importar arquivo. Verifique o formato.' : '❌ Error importing file. Check format.');
+        alert(language === 'pt' ? '❌ Erro ao ler arquivo.' : '❌ File read error.');
       }
     };
     reader.readAsText(file);
@@ -64,172 +103,221 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
 
   const handleClearAll = () => {
     const message = language === 'pt' 
-      ? '⚠️ ATENÇÃO: Isso apagará todas as transações permanentemente. Continuar?' 
-      : '⚠️ WARNING: This will delete all transactions permanently. Continue?';
+      ? '⚠️ DELETAR TUDO? Esta ação é irreversível.' 
+      : '⚠️ DELETE ALL? This action cannot be undone.';
     if (confirm(message)) {
-      localStorage.removeItem('fincasal_data');
-      localStorage.removeItem('fincasal_draft');
-      alert(language === 'pt' ? 'Dados limpos. Recarregando...' : 'Data cleared. Reloading...');
+      localStorage.removeItem('fincontrol_data');
+      localStorage.removeItem('fincontrol_draft');
       window.location.reload();
     }
   };
 
   return (
-    <main className="pt-32 pb-40 px-6 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="mb-12">
+    <main className="pt-32 pb-48 px-6 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
+      {/* EXCLUSIVO PARA IMPRESSÃO / PDF */}
+      <div className="hidden print:block mb-12">
+        <div className="flex justify-between items-start border-b-4 border-slate-900 pb-10 mb-10">
+           <div>
+             <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase mb-2">Relatório Consolidado</h1>
+             <p className="text-slate-500 font-bold uppercase text-xs tracking-[0.4em]">Plataforma FinControl Pro • Inteligência em Gestão</p>
+           </div>
+           <div className="text-right">
+             <p className="text-slate-400 font-black uppercase text-[10px] tracking-widest mb-1">Data de Emissão</p>
+             <p className="text-slate-900 font-black text-xl tabular-nums">{new Date().toLocaleDateString()}</p>
+           </div>
+        </div>
+        
+        {summary && (
+          <div className="grid grid-cols-3 gap-8 mb-16">
+            <div className="bg-slate-50 p-8 rounded-[40px] border-2 border-slate-200">
+              <p className="text-[11px] font-black uppercase text-slate-400 tracking-widest mb-3">Total de Entradas</p>
+              <p className="text-4xl font-black text-emerald-600 tabular-nums">{formatCurrency(summary.totalIncome)}</p>
+            </div>
+            <div className="bg-slate-50 p-8 rounded-[40px] border-2 border-slate-200">
+              <p className="text-[11px] font-black uppercase text-slate-400 tracking-widest mb-3">Total de Saídas</p>
+              <p className="text-4xl font-black text-rose-600 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
+            </div>
+            <div className="bg-slate-900 p-8 rounded-[40px] shadow-2xl">
+              <p className="text-[11px] font-black uppercase text-white/40 tracking-widest mb-3">Saldo Disponível</p>
+              <p className="text-4xl font-black text-white tabular-nums">{formatCurrency(summary.balance)}</p>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-12">
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-widest mb-8 border-l-8 border-slate-900 pl-6">Detalhamento de Fluxo</h2>
+          <table className="w-full text-left text-[11px] border-collapse">
+            <thead>
+              <tr className="border-b-2 border-slate-300">
+                <th className="py-4 font-black uppercase tracking-wider text-slate-500 w-32">Data</th>
+                <th className="py-4 font-black uppercase tracking-wider text-slate-500">Descrição do Lançamento</th>
+                <th className="py-4 font-black uppercase tracking-wider text-slate-500">Categoria</th>
+                <th className="py-4 font-black uppercase tracking-wider text-slate-500 text-right">Valor</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {transactions.map((tx) => (
+                <tr key={tx.id} className="page-break-inside-avoid">
+                  <td className="py-4 tabular-nums text-slate-400 font-bold">{tx.date}</td>
+                  <td className="py-4 font-black text-slate-900 text-sm">{tx.description}</td>
+                  <td className="py-4 text-slate-500 uppercase font-black text-[9px]">{t.categories[tx.category]}</td>
+                  <td className={`py-4 text-right font-black text-sm tabular-nums ${tx.type === 'Entrada' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    {tx.type === 'Entrada' ? '+' : '-'} {formatCurrency(tx.amount)}
+                  </td>
+                </tr>
+              ))}
+              {transactions.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="py-20 text-center text-slate-400 font-black italic uppercase tracking-widest">Sem movimentações no período.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          <div className="mt-20 pt-10 border-t border-slate-100 text-center">
+            <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.5em]">Gerado automaticamente via Engine FinControl Pro. Documento para fins de consulta pessoal.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-16 no-print">
         <button 
           onClick={onBack} 
-          className="flex items-center gap-2 text-theme font-black text-xs uppercase tracking-widest mb-4 hover:gap-3 transition-all group no-print"
+          className="flex items-center gap-3 text-theme font-black text-xs uppercase tracking-[0.3em] mb-6 hover:gap-5 transition-all group"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform group-hover:-translate-x-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           {t.saveAndBack}
         </button>
-        <h1 className={`text-5xl md:text-6xl font-black tracking-tighter drop-shadow-sm transition-colors duration-300 ${themeOrWhite}`}>
+        <h1 className={`text-6xl md:text-8xl font-black tracking-tighter transition-colors duration-500 ${themeOrWhite}`}>
           {t.settings}
         </h1>
       </div>
 
-      <div className="space-y-8">
-        {/* Idioma */}
-        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md no-print">
-          <h2 className="text-xl font-black text-theme mb-8 flex items-center gap-3">
-            <span className="text-2xl filter drop-shadow-sm">🌍</span> {t.language}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            {['pt', 'en', 'es'].map((id) => (
-              <button 
-                key={id} 
-                onClick={() => updateSetting('language', id)} 
-                className={`p-6 rounded-2xl border-2 transition-all text-center group ${settings.language === id ? 'border-theme bg-theme/10 dark:bg-theme/30 shadow-theme/10' : 'border-transparent bg-slate-100/50 dark:bg-white/5 hover:border-theme/30'}`}
-              >
-                <p className={`font-black text-sm transition-colors ${settings.language === id ? 'text-theme' : `${labelColor} group-hover:text-theme`}`}>
-                  {id === 'pt' ? 'Português' : id === 'en' ? 'English' : 'Español'}
-                </p>
-              </button>
-            ))}
-          </div>
-        </section>
+      <div className="space-y-10 no-print">
+        {/* Grupos de Configuração */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Idioma */}
+          <section className="bg-white/80 dark:bg-white/5 backdrop-blur-3xl p-10 rounded-[48px] border border-slate-200 dark:border-white/10">
+            <h2 className="text-xs font-black text-theme uppercase tracking-[0.4em] mb-8 flex items-center gap-4">
+              <span className="w-1.5 h-1.5 bg-theme rounded-full animate-ping"></span> {t.language}
+            </h2>
+            <div className="flex flex-col gap-3">
+              {['pt', 'en', 'es'].map((id) => (
+                <button 
+                  key={id} 
+                  onClick={() => updateSetting('language', id)} 
+                  className={`p-5 rounded-3xl border-2 transition-all text-left group flex items-center justify-between ${settings.language === id ? 'border-theme bg-theme/5 shadow-inner' : 'border-transparent bg-slate-50/50 dark:bg-white/5 hover:border-theme/30'}`}
+                >
+                  <span className={`font-black text-sm uppercase tracking-widest ${settings.language === id ? 'text-theme' : `${labelColor}`}`}>
+                    {id === 'pt' ? 'Português' : id === 'en' ? 'English' : 'Español'}
+                  </span>
+                  {settings.language === id && <span className="text-theme">●</span>}
+                </button>
+              ))}
+            </div>
+          </section>
 
-        {/* Paleta de Cores */}
-        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md no-print">
-          <h2 className="text-xl font-black text-theme mb-8 flex items-center gap-3">
-            <span className="text-2xl filter drop-shadow-sm">🎨</span> {t.palette}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            {[
-              { id: 'ruby', label: 'Rubi Real', color: 'bg-red-600' },
-              { id: 'classic', label: 'Azul Marinho', color: 'bg-indigo-600' },
-              { id: 'forest', label: 'Floresta Verde', color: 'bg-emerald-600' }
-            ].map((theme) => (
-              <button 
-                key={theme.id} 
-                onClick={() => updateSetting('theme', theme.id)} 
-                className={`p-6 rounded-2xl border-2 flex items-center justify-center gap-4 transition-all group ${settings.theme === theme.id ? 'border-theme bg-theme/10 dark:bg-theme/30 shadow-theme/10' : 'border-transparent bg-slate-100/50 dark:bg-white/5 hover:border-theme/30'}`}
-              >
-                <div className={`w-8 h-8 rounded-full ${theme.color} shadow-lg shadow-black/20 ring-2 ring-white/10`} />
-                <span className={`text-[11px] font-black uppercase tracking-[0.15em] transition-colors ${settings.theme === theme.id ? 'text-theme' : `${labelColor} group-hover:text-theme`}`}>
-                  {theme.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
+          {/* Temas Visual */}
+          <section className="bg-white/80 dark:bg-white/5 backdrop-blur-3xl p-10 rounded-[48px] border border-slate-200 dark:border-white/10">
+            <h2 className="text-xs font-black text-theme uppercase tracking-[0.4em] mb-8 flex items-center gap-4">
+               <span className="w-1.5 h-1.5 bg-theme rounded-full animate-ping"></span> {t.palette}
+            </h2>
+            <div className="grid grid-cols-1 gap-4">
+              {[
+                { id: 'ruby', label: 'Ruby Crimson', color: 'bg-red-500' },
+                { id: 'classic', label: 'Hyper Indigo', color: 'bg-indigo-500' },
+                { id: 'forest', label: 'Emerald Mint', color: 'bg-emerald-500' }
+              ].map((theme) => (
+                <button 
+                  key={theme.id} 
+                  onClick={() => updateSetting('theme', theme.id)} 
+                  className={`p-5 rounded-3xl border-2 flex items-center justify-between transition-all group ${settings.theme === theme.id ? 'border-theme bg-theme/5' : 'border-transparent bg-slate-50/50 dark:bg-white/5 hover:border-theme/30'}`}
+                >
+                  <div className="flex items-center gap-5">
+                    <div className={`w-10 h-10 rounded-2xl ${theme.color} shadow-lg ring-4 ring-white/10 transition-transform group-hover:rotate-12`} />
+                    <span className={`text-sm font-black uppercase tracking-widest ${settings.theme === theme.id ? 'text-theme' : `${labelColor}`}`}>
+                      {theme.label}
+                    </span>
+                  </div>
+                  {settings.theme === theme.id && <span className="text-theme">●</span>}
+                </button>
+              ))}
+            </div>
+          </section>
+        </div>
 
-        {/* Tamanho da Fonte */}
-        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md no-print">
-          <h2 className="text-xl font-black text-theme mb-8 flex items-center gap-3">
-            <span className="text-2xl filter drop-shadow-sm">🔍</span> {t.fontSize}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            {[
-              { id: 'small', label: language === 'pt' ? 'Pequeno' : 'Small' },
-              { id: 'medium', label: language === 'pt' ? 'Médio' : 'Medium' },
-              { id: 'large', label: language === 'pt' ? 'Grande' : 'Large' }
-            ].map((size) => (
-              <button 
-                key={size.id} 
-                onClick={() => updateSetting('fontSize', size.id)} 
-                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center justify-center gap-3 group ${settings.fontSize === size.id ? 'border-theme bg-theme/10 dark:bg-theme/30 shadow-theme/10' : 'border-transparent bg-slate-100/50 dark:bg-white/5 hover:border-theme/30'}`}
-              >
-                <span className={`font-black transition-colors ${settings.fontSize === size.id ? 'text-theme' : `${labelColor} group-hover:text-theme text-2xl transition-all`} ${size.id === 'small' ? 'text-sm' : size.id === 'medium' ? 'text-xl' : 'text-3xl'}`}>
-                  Aa
-                </span>
-                <span className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${settings.fontSize === size.id ? 'text-theme' : `${secondaryLabelColor} group-hover:text-theme`}`}>
-                  {size.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* Modo Claro (Toggle Sol) */}
-        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 flex items-center justify-between transition-all hover:shadow-md no-print">
-           <div className="flex items-center gap-5">
-             <div className="w-12 h-12 rounded-2xl bg-theme/15 flex items-center justify-center text-2xl shadow-inner border border-theme/10">☀️</div>
+        {/* Modo de Visualização */}
+        <section className="bg-white/80 dark:bg-white/5 backdrop-blur-3xl p-10 rounded-[48px] border border-slate-200 dark:border-white/10 flex items-center justify-between">
+           <div className="flex items-center gap-6">
+             <div className="w-16 h-16 rounded-3xl bg-theme/10 flex items-center justify-center text-3xl shadow-inner border border-theme/20">
+               {settings.lightMode ? '☀️' : '🌙'}
+             </div>
              <div>
-               <p className={`font-black text-lg leading-tight transition-colors duration-300 ${themeOrWhite}`}>{language === 'pt' ? 'Modo Claro' : 'Light Mode'}</p>
-               <p className={`text-[10px] ${secondaryLabelColor} font-black uppercase tracking-[0.2em] mt-1`}>
+               <p className={`font-black text-xl leading-tight transition-colors duration-500 ${themeOrWhite}`}>
                  {language === 'pt' ? 'Alta Visibilidade' : 'High Visibility'}
+               </p>
+               <p className={`text-[10px] ${secondaryLabelColor} font-black uppercase tracking-[0.3em] mt-1.5`}>
+                 {language === 'pt' ? 'Alternar entre claro e escuro' : 'Toggle between light and dark'}
                </p>
              </div>
            </div>
            <button 
              onClick={() => updateSetting('lightMode', !settings.lightMode)} 
-             className={`w-16 h-9 rounded-full transition-all relative p-1 ${settings.lightMode ? 'bg-theme' : 'bg-slate-300 dark:bg-white/20'}`}
+             className={`w-20 h-10 rounded-full transition-all relative p-1.5 ${settings.lightMode ? 'bg-theme shadow-[0_0_20px_var(--primary-shadow)]' : 'bg-slate-300 dark:bg-white/10'}`}
            >
-             <div className={`w-7 h-7 bg-white rounded-full transition-all shadow-lg ${settings.lightMode ? 'translate-x-7' : 'translate-x-0'}`} />
+             <div className={`w-7 h-7 bg-white rounded-full transition-all shadow-2xl ${settings.lightMode ? 'translate-x-10' : 'translate-x-0'}`} />
            </button>
         </section>
 
-        {/* Gerenciamento de Dados - AGORA NO FINAL */}
-        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md">
-          <h2 className="text-xl font-black text-theme mb-8 flex items-center gap-3">
-            <span className="text-2xl filter drop-shadow-sm">💾</span> {language === 'pt' ? 'Gerenciamento de Dados' : 'Data Management'}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button 
-              onClick={handleExportData}
-              className="flex flex-col items-center gap-4 p-6 bg-emerald-500/10 dark:bg-emerald-500/20 border-2 border-emerald-500/20 rounded-3xl hover:bg-emerald-500/20 transition-all group no-print"
-              title="Baixar arquivo JSON para backup ou outro PC"
-            >
-              <span className="text-3xl transition-transform group-hover:-translate-y-1">📤</span>
-              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 text-center">Exportar Dados (JSON)</span>
-            </button>
-            
-            <button 
-              onClick={handleExportPDF}
-              className="flex flex-col items-center gap-4 p-6 bg-indigo-500/10 dark:bg-indigo-500/20 border-2 border-indigo-500/20 rounded-3xl hover:bg-indigo-500/20 transition-all group no-print"
-              title="Imprimir relatório completo em PDF"
-            >
-              <span className="text-3xl transition-transform group-hover:-translate-y-1">📄</span>
-              <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 text-center">Exportar PDF / Imprimir</span>
-            </button>
-
-            <button 
-              onClick={() => fileInputRef.current?.click()}
-              className="flex flex-col items-center gap-4 p-6 bg-blue-500/10 dark:bg-blue-500/20 border-2 border-blue-500/20 rounded-3xl hover:bg-blue-500/20 transition-all group no-print"
-              title="Importar arquivo JSON de outro PC"
-            >
-              <span className="text-3xl transition-transform group-hover:-translate-y-1">📥</span>
-              <span className="text-[9px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 text-center">Importar Backup</span>
-              <input type="file" ref={fileInputRef} onChange={handleImportData} accept=".json" className="hidden" />
-            </button>
-            
-            <button 
-              onClick={handleClearAll}
-              className="flex flex-col items-center gap-4 p-6 bg-rose-500/10 dark:bg-rose-500/20 border-2 border-rose-500/20 rounded-3xl hover:bg-rose-500/20 transition-all group no-print"
-            >
-              <span className="text-3xl transition-transform group-hover:scale-110">🗑️</span>
-              <span className="text-[9px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400 text-center">Limpar Tudo</span>
-            </button>
+        {/* Gerenciamento Master de Dados */}
+        <section className="bg-slate-900 dark:bg-white/5 p-12 rounded-[56px] border border-white/10 shadow-3xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-10 opacity-5">
+            <FCLogo className="w-48 h-48 text-white" />
           </div>
-          <p className="mt-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center leading-relaxed">
-            {language === 'pt' 
-              ? 'Use JSON para levar seus dados para outro dispositivo. Use PDF para guardar uma cópia física.' 
-              : 'Use JSON to move data to another device. Use PDF for a physical copy.'}
-          </p>
+          <div className="relative z-10">
+            <h2 className="text-xs font-black text-theme uppercase tracking-[0.5em] mb-12 flex items-center gap-4">
+              <span className="w-2 h-2 bg-theme rounded-full"></span> {language === 'pt' ? 'Central de Arquivos' : 'Files Central'}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <button 
+                onClick={handleExportData}
+                className="flex flex-col items-center gap-6 p-8 bg-white/5 border border-white/10 rounded-[40px] hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all group"
+              >
+                <div className="text-4xl transition-transform group-hover:-translate-y-2">📦</div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-emerald-400 text-center">Exportar JSON <br/><span className="text-[8px] opacity-50">(Backup)</span></span>
+              </button>
+              
+              <button 
+                onClick={handleExportPDF}
+                className="flex flex-col items-center gap-6 p-8 bg-white/5 border border-white/10 rounded-[40px] hover:bg-indigo-500/10 hover:border-indigo-500/30 transition-all group"
+              >
+                <div className="text-4xl transition-transform group-hover:-translate-y-2">📄</div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-indigo-400 text-center">Exportar PDF <br/><span className="text-[8px] opacity-50">(Relatório)</span></span>
+              </button>
+
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="flex flex-col items-center gap-6 p-8 bg-white/5 border border-white/10 rounded-[40px] hover:bg-blue-500/10 hover:border-blue-500/30 transition-all group"
+              >
+                <div className="text-4xl transition-transform group-hover:-translate-y-2">📥</div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-blue-400 text-center">Importar Backup <br/><span className="text-[8px] opacity-50">(Restaurar)</span></span>
+                <input type="file" ref={fileInputRef} onChange={handleImportData} accept=".json" className="hidden" />
+              </button>
+              
+              <button 
+                onClick={handleClearAll}
+                className="flex flex-col items-center gap-6 p-8 bg-rose-500/5 border border-rose-500/10 rounded-[40px] hover:bg-rose-500/20 hover:border-rose-500/30 transition-all group"
+              >
+                <div className="text-4xl transition-transform group-hover:rotate-12">💣</div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-rose-500/80 group-hover:text-rose-400 text-center">Nuclear Clean <br/><span className="text-[8px] opacity-50">(Reset Total)</span></span>
+              </button>
+            </div>
+            
+            <p className="mt-12 text-[10px] font-bold text-white/20 uppercase tracking-[0.4em] text-center leading-relaxed italic">
+              A FinControl Pro recomenda backups semanais para garantir a integridade da sua soberania financeira.
+            </p>
+          </div>
         </section>
       </div>
     </main>

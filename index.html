@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinCasal Pro | Gestão Financeira para Casais</title>
-    <meta name="description" content="O controle financeiro definitivo para casais modernos com IA.">
+    <title>FinControl Pro | Gestão Financeira Inteligente</title>
+    <meta name="description" content="O controle financeiro definitivo para uma gestão moderna com IA.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -17,8 +17,8 @@
             --primary-border: #e0e7ff;
             --primary-shadow: rgba(79, 70, 229, 0.2);
             --bg-dark: #02040a; 
-            --nebula-1: rgba(99, 102, 241, 0.15);
-            --nebula-2: rgba(236, 72, 153, 0.08);
+            --nebula-1: rgba(99, 102, 241, 0.12);
+            --nebula-2: rgba(236, 72, 153, 0.05);
         }
         
         body { 
@@ -34,7 +34,7 @@
 
         .theme-ruby {
             --primary: #e11d48; --primary-dark: #be123c; --primary-light: #fff1f2; --primary-border: #fecdd3; --primary-shadow: rgba(225, 29, 72, 0.2);
-            --bg-dark: #050001; --nebula-1: rgba(225, 29, 72, 0.2); --nebula-2: rgba(79, 70, 229, 0.1);
+            --bg-dark: #050001; --nebula-1: rgba(225, 29, 72, 0.15); --nebula-2: rgba(79, 70, 229, 0.08);
         }
         .theme-classic {
             --primary: #4f46e5; --primary-dark: #4338ca; --primary-light: #eef2ff; --primary-border: #e0e7ff; --primary-shadow: rgba(79, 70, 229, 0.2);
@@ -42,17 +42,11 @@
         }
         .theme-forest {
             --primary: #10b981; --primary-dark: #059669; --primary-light: #ecfdf5; --primary-border: #d1fae5; --primary-shadow: rgba(16, 185, 129, 0.2);
-            --bg-dark: #000402; --nebula-1: rgba(16, 185, 129, 0.2); --nebula-2: rgba(34, 197, 94, 0.1);
+            --bg-dark: #000402; --nebula-1: rgba(16, 185, 129, 0.18); --nebula-2: rgba(34, 197, 94, 0.08);
         }
 
         body.dark-mode { 
             background-color: var(--bg-dark) !important; 
-            background-image: 
-                radial-gradient(circle at center, transparent 0%, var(--bg-dark) 90%),
-                url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?auto=format&fit=crop&w=2800&q=95') !important;
-            background-size: cover !important;
-            background-position: center !important;
-            background-attachment: fixed !important;
             color: #ffffff !important; 
         }
 
@@ -63,70 +57,35 @@
             pointer-events: none;
             z-index: 0;
             background: 
-                radial-gradient(circle at 15% 50%, var(--nebula-1) 0%, transparent 45%),
-                radial-gradient(circle at 85% 30%, var(--nebula-2) 0%, transparent 40%),
-                radial-gradient(ellipse at 50% 10%, rgba(255,255,255,0.03) 0%, transparent 50%);
+                radial-gradient(circle at 10% 20%, var(--nebula-1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, var(--nebula-2) 0%, transparent 40%);
             mix-blend-mode: screen;
-            animation: cosmicFloat 30s infinite alternate ease-in-out;
-            opacity: 0.7;
-        }
-
-        body.dark-mode::after {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 1;
-            background-image: 
-                radial-gradient(1.5px 1.5px at 15% 25%, white, transparent),
-                radial-gradient(1px 1px at 45% 65%, rgba(255,255,255,0.8), transparent),
-                radial-gradient(2px 2px at 70% 20%, white, transparent),
-                radial-gradient(1.2px 1.2px at 90% 90%, white, transparent),
-                radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.6), transparent);
-            background-size: 500px 500px;
-            opacity: 0.5;
-            animation: starsPulsing 10s infinite ease-in-out;
+            animation: cosmicFloat 40s infinite alternate ease-in-out;
+            opacity: 0.8;
         }
 
         @keyframes cosmicFloat {
             0% { transform: scale(1) translate(0, 0); }
-            50% { transform: scale(1.1) translate(20px, 15px); opacity: 0.5; }
-            100% { transform: scale(1.05) translate(-10px, -5px); }
-        }
-
-        @keyframes starsPulsing {
-            0%, 100% { opacity: 0.4; filter: blur(0.5px); }
-            50% { opacity: 0.8; filter: blur(0px); }
+            100% { transform: scale(1.2) translate(30px, 20px); }
         }
 
         body.dark-mode .bg-white { 
-            background-color: rgba(0, 0, 0, 0.7) !important; 
-            border-color: rgba(255, 255, 255, 0.15) !important;
-            backdrop-filter: blur(45px) saturate(220%) !important;
-            -webkit-backdrop-filter: blur(45px) saturate(220%) !important;
-            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95);
-        }
-
-        body:not(.dark-mode) .text-gray-900 { color: #0f172a !important; font-weight: 800; }
-        body:not(.dark-mode) .bg-white { background-color: #ffffff !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-
-        body.dark-mode .text-gray-900, 
-        body.dark-mode .text-gray-800,
-        body.dark-mode .text-slate-900,
-        body.dark-mode .text-white { 
-            color: #ffffff !important; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            background-color: rgba(255, 255, 255, 0.03) !important; 
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(40px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
         }
 
         @media print {
             .no-print { display: none !important; }
-            body { background-color: white !important; color: black !important; background-image: none !important; }
-            body::before, body::after { display: none; }
+            body { background: white !important; color: black !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .print\:block { display: block !important; }
         }
 
         .text-theme { color: var(--primary) !important; }
         .bg-theme { background-color: var(--primary) !important; }
+        .perspective-1000 { perspective: 1000px; }
     </style>
     <script type="importmap">
 {
