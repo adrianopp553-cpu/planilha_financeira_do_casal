@@ -173,4 +173,43 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
                 className={`p-6 rounded-2xl border-2 flex items-center justify-center gap-4 transition-all group ${settings.theme === theme.id ? 'border-theme bg-theme/10 dark:bg-theme/30 shadow-theme/10' : 'border-transparent bg-slate-100/50 dark:bg-white/5 hover:border-theme/30'}`}
               >
                 <div className={`w-8 h-8 rounded-full ${theme.color} shadow-lg shadow-black/20 ring-2 ring-white/10`} />
-                <span className={`text-[11px] font-black uppercase tracking-[0.15em] transition-colors ${settings.theme === theme.id ? 'text-theme' : `${labelColor} group-hover:
+                <span className={`text-[11px] font-black uppercase tracking-[0.15em] transition-colors ${settings.theme === theme.id ? 'text-theme' : `${labelColor} group-hover:text-theme`}`}>
+                  {theme.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Tamanho da Fonte */}
+        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md">
+          <h2 className="text-xl font-black text-theme mb-8 flex items-center gap-3">
+            <span className="text-2xl filter drop-shadow-sm">🔍</span> {t.fontSize}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {[
+              { id: 'small', label: language === 'pt' ? 'Pequeno' : 'Small' },
+              { id: 'medium', label: language === 'pt' ? 'Médio' : 'Medium' },
+              { id: 'large', label: language === 'pt' ? 'Grande' : 'Large' }
+            ].map((size) => (
+              <button 
+                key={size.id} 
+                onClick={() => updateSetting('fontSize', size.id)} 
+                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center justify-center gap-3 group ${settings.fontSize === size.id ? 'border-theme bg-theme/10 dark:bg-theme/30 shadow-theme/10' : 'border-transparent bg-slate-100/50 dark:bg-white/5 hover:border-theme/30'}`}
+              >
+                <span className={`font-black transition-colors ${settings.fontSize === size.id ? 'text-theme' : `${labelColor} group-hover:text-theme text-2xl transition-all`} ${size.id === 'small' ? 'text-sm' : size.id === 'medium' ? 'text-xl' : 'text-3xl'}`}>
+                  Aa
+                </span>
+                <span className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${settings.fontSize === size.id ? 'text-theme' : `${secondaryLabelColor} group-hover:text-theme`}`}>
+                  {size.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+};
+
+export default SettingsView;
