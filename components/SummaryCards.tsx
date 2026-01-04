@@ -18,43 +18,46 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({ summary, language }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div className="bg-white p-6 rounded-[28px] shadow-sm border border-theme-light flex items-center transition hover:shadow-md">
-        <div className="bg-emerald-50 p-3 rounded-2xl mr-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+      {/* Card de Entradas */}
+      <div className="bg-white dark:bg-white/5 p-6 rounded-[32px] shadow-sm border border-black/5 dark:border-white/10 flex items-center transition hover:shadow-md">
+        <div className="bg-emerald-500/10 p-4 rounded-2xl mr-5">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 11l5-5m0 0l5 5m-5-5v12" />
           </svg>
         </div>
         <div>
-          <span className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] block mb-1">{t.income}</span>
-          <span className="text-2xl font-black text-emerald-600">{formatCurrency(summary.totalIncome)}</span>
+          <span className="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] block mb-1">{t.income}</span>
+          <span className="text-2xl font-black text-emerald-500 tabular-nums">{formatCurrency(summary.totalIncome)}</span>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-[28px] shadow-sm border border-theme-light flex items-center transition hover:shadow-md">
-        <div className="bg-red-50 p-3 rounded-2xl mr-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+      {/* Card de Saídas */}
+      <div className="bg-white dark:bg-white/5 p-6 rounded-[32px] shadow-sm border border-black/5 dark:border-white/10 flex items-center transition hover:shadow-md">
+        <div className="bg-rose-500/10 p-4 rounded-2xl mr-5">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
           </svg>
         </div>
         <div>
-          <span className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] block mb-1">{t.expenses}</span>
-          <span className="text-2xl font-black text-red-600">{formatCurrency(summary.totalExpense)}</span>
+          <span className="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] block mb-1">{t.expenses}</span>
+          <span className="text-2xl font-black text-rose-500 tabular-nums">{formatCurrency(summary.totalExpense)}</span>
         </div>
       </div>
 
-      <div className={`p-6 rounded-[28px] shadow-2xl border flex items-center transition hover:scale-[1.02] duration-500 ${
+      {/* Card de Saldo Total - DESTAQUE MÁXIMO (OPACIDADE 100%) */}
+      <div className={`p-8 rounded-[40px] shadow-2xl flex items-center transition-all duration-500 hover:scale-[1.03] ring-offset-4 ring-offset-white dark:ring-offset-black ring-4 ${
         summary.balance >= 0 
-          ? 'bg-white border-theme-light ring-4 ring-theme-light shadow-theme' 
-          : 'bg-theme-light border-theme ring-4 ring-theme-light shadow-theme'
+          ? 'bg-theme text-white ring-theme/20 shadow-theme/40' 
+          : 'bg-rose-600 text-white ring-rose-600/20 shadow-rose-600/40'
       }`}>
-        <div className={`p-3 rounded-2xl mr-4 ${summary.balance >= 0 ? 'bg-theme text-white' : 'bg-white text-theme'}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <div className="bg-white/20 p-4 rounded-2xl mr-6 backdrop-blur-md">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <div>
-          <span className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] block mb-1">{t.coupleBalance}</span>
-          <span className={`text-3xl font-black ${summary.balance >= 0 ? 'text-gray-900' : 'text-theme'}`}>
+          <span className="text-white/60 text-[11px] font-black uppercase tracking-[0.3em] block mb-1">{t.coupleBalance}</span>
+          <span className="text-3xl md:text-4xl font-black tabular-nums tracking-tighter">
             {formatCurrency(summary.balance)}
           </span>
         </div>

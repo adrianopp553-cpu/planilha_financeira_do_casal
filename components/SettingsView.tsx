@@ -3,7 +3,6 @@ import React, { useRef } from 'react';
 import { AppSettings, FinancialSummary, Transaction } from '../types';
 import { translations } from '../translations';
 
-// Fix: Added missing FCLogo component definition to resolve reference error
 const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -12,23 +11,9 @@ const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
         <stop offset="100%" stopColor="currentColor" stopOpacity="0.6" />
       </linearGradient>
     </defs>
-    {/* Background geométrico moderno */}
     <rect x="15" y="15" width="70" height="70" rx="18" fill="url(#logoGrad)" fillOpacity="0.1" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
-    
-    {/* Letra F */}
-    <path 
-      d="M32 35 H 58 V 42 H 40 V 48 H 55 V 55 H 40 V 70 H 32 V 35 Z" 
-      fill="currentColor" 
-    />
-    
-    {/* Letra C interligada */}
-    <path 
-      d="M62 38 C 72 38, 78 45, 78 55 C 78 65, 72 72, 62 72 M 62 48 C 68 48, 70 52, 70 55 C 70 58, 68 62, 62 62" 
-      stroke="currentColor" 
-      strokeWidth="6" 
-      strokeLinecap="round" 
-      fill="none"
-    />
+    <path d="M32 35 H 58 V 42 H 40 V 48 H 55 V 55 H 40 V 70 H 32 V 35 Z" fill="currentColor" />
+    <path d="M62 38 C 72 38, 78 45, 78 55 C 78 65, 72 72, 62 72 M 62 48 C 68 48, 70 52, 70 55 C 70 58, 68 62, 62 62" stroke="currentColor" strokeWidth="6" strokeLinecap="round" fill="none" />
   </svg>
 );
 
@@ -81,31 +66,25 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
   const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const content = JSON.parse(e.target?.result as string);
         if (content.transactions) {
           localStorage.setItem('fincontrol_data', JSON.stringify(content.transactions));
-          if (content.settings) {
-            onUpdate(content.settings);
-          }
-          alert(language === 'pt' ? '✅ Backup Restaurado com Sucesso!' : '✅ Backup Restored Successfully!');
+          if (content.settings) onUpdate(content.settings);
+          alert(language === 'pt' ? '✅ Backup Restaurado!' : '✅ Backup Restored!');
           window.location.reload();
         }
       } catch (err) {
-        alert(language === 'pt' ? '❌ Erro ao ler arquivo.' : '❌ File read error.');
+        alert(language === 'pt' ? '❌ Erro ao ler arquivo.' : '❌ File error.');
       }
     };
     reader.readAsText(file);
   };
 
   const handleClearAll = () => {
-    const message = language === 'pt' 
-      ? '⚠️ DELETAR TUDO? Esta ação é irreversível.' 
-      : '⚠️ DELETE ALL? This action cannot be undone.';
-    if (confirm(message)) {
+    if (confirm(language === 'pt' ? '⚠️ DELETAR TUDO?' : '⚠️ DELETE ALL?')) {
       localStorage.removeItem('fincontrol_data');
       localStorage.removeItem('fincontrol_draft');
       window.location.reload();
@@ -114,71 +93,77 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
 
   return (
     <main className="pt-32 pb-48 px-6 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
-      {/* EXCLUSIVO PARA IMPRESSÃO / PDF */}
-      <div className="hidden print:block mb-12">
-        <div className="flex justify-between items-start border-b-4 border-slate-900 pb-10 mb-10">
-           <div>
-             <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase mb-2">Relatório Consolidado</h1>
-             <p className="text-slate-500 font-bold uppercase text-xs tracking-[0.4em]">Plataforma FinControl Pro • Inteligência em Gestão</p>
+      {/* SEÇÃO DE IMPRESSÃO - ENQUADRAMENTO PROFISSIONAL */}
+      <div className="hidden print:block w-full text-black bg-white">
+        <div className="flex justify-between items-end border-b-2 border-slate-900 pb-6 mb-8">
+           <div className="flex items-center gap-4">
+             <FCLogo className="w-12 h-12 text-slate-900" />
+             <div>
+               <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Relatório Financeiro</h1>
+               <p className="text-slate-500 font-bold uppercase text-[9px] tracking-[0.3em] mt-1">Plataforma FinControl Pro • Inteligência em Gestão</p>
+             </div>
            </div>
            <div className="text-right">
-             <p className="text-slate-400 font-black uppercase text-[10px] tracking-widest mb-1">Data de Emissão</p>
-             <p className="text-slate-900 font-black text-xl tabular-nums">{new Date().toLocaleDateString()}</p>
+             <p className="text-slate-400 font-black uppercase text-[8px] tracking-widest mb-1">Emitido em</p>
+             <p className="text-slate-900 font-black text-base tabular-nums">{new Date().toLocaleDateString()}</p>
            </div>
         </div>
         
         {summary && (
-          <div className="grid grid-cols-3 gap-8 mb-16">
-            <div className="bg-slate-50 p-8 rounded-[40px] border-2 border-slate-200">
-              <p className="text-[11px] font-black uppercase text-slate-400 tracking-widest mb-3">Total de Entradas</p>
-              <p className="text-4xl font-black text-emerald-600 tabular-nums">{formatCurrency(summary.totalIncome)}</p>
+          <div className="grid grid-cols-3 gap-4 mb-10">
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-center">
+              <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-2">Total de Entradas</p>
+              <p className="text-xl font-black text-emerald-600 tabular-nums leading-none">{formatCurrency(summary.totalIncome)}</p>
             </div>
-            <div className="bg-slate-50 p-8 rounded-[40px] border-2 border-slate-200">
-              <p className="text-[11px] font-black uppercase text-slate-400 tracking-widest mb-3">Total de Saídas</p>
-              <p className="text-4xl font-black text-rose-600 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-center">
+              <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-2">Total de Saídas</p>
+              <p className="text-xl font-black text-rose-600 tabular-nums leading-none">{formatCurrency(summary.totalExpense)}</p>
             </div>
-            <div className="bg-slate-900 p-8 rounded-[40px] shadow-2xl">
-              <p className="text-[11px] font-black uppercase text-white/40 tracking-widest mb-3">Saldo Disponível</p>
-              <p className="text-4xl font-black text-white tabular-nums">{formatCurrency(summary.balance)}</p>
+            <div className="bg-slate-900 p-5 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg">
+              <p className="text-[9px] font-black uppercase text-white/40 tracking-widest mb-2">Saldo Atual</p>
+              <p className="text-xl font-black text-white tabular-nums leading-none">{formatCurrency(summary.balance)}</p>
             </div>
           </div>
         )}
 
-        <div className="mt-12">
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-widest mb-8 border-l-8 border-slate-900 pl-6">Detalhamento de Fluxo</h2>
-          <table className="w-full text-left text-[11px] border-collapse">
-            <thead>
-              <tr className="border-b-2 border-slate-300">
-                <th className="py-4 font-black uppercase tracking-wider text-slate-500 w-32">Data</th>
-                <th className="py-4 font-black uppercase tracking-wider text-slate-500">Descrição do Lançamento</th>
-                <th className="py-4 font-black uppercase tracking-wider text-slate-500">Categoria</th>
-                <th className="py-4 font-black uppercase tracking-wider text-slate-500 text-right">Valor</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {transactions.map((tx) => (
-                <tr key={tx.id} className="page-break-inside-avoid">
-                  <td className="py-4 tabular-nums text-slate-400 font-bold">{tx.date}</td>
-                  <td className="py-4 font-black text-slate-900 text-sm">{tx.description}</td>
-                  <td className="py-4 text-slate-500 uppercase font-black text-[9px]">{t.categories[tx.category]}</td>
-                  <td className={`py-4 text-right font-black text-sm tabular-nums ${tx.type === 'Entrada' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                    {tx.type === 'Entrada' ? '+' : '-'} {formatCurrency(tx.amount)}
-                  </td>
+        <div className="mt-6">
+          <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4 border-l-4 border-slate-900 pl-3">Extrato Detalhado</h2>
+          <div className="border border-slate-200 rounded-xl overflow-hidden">
+            <table className="w-full text-left text-[10px] border-collapse">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  <th className="py-3 px-4 font-black uppercase tracking-wider text-slate-500 w-24">Data</th>
+                  <th className="py-3 px-4 font-black uppercase tracking-wider text-slate-500">Descrição</th>
+                  <th className="py-3 px-4 font-black uppercase tracking-wider text-slate-500">Categoria</th>
+                  <th className="py-3 px-4 font-black uppercase tracking-wider text-slate-500 text-right">Valor</th>
                 </tr>
-              ))}
-              {transactions.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="py-20 text-center text-slate-400 font-black italic uppercase tracking-widest">Sem movimentações no período.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          <div className="mt-20 pt-10 border-t border-slate-100 text-center">
-            <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.5em]">Gerado automaticamente via Engine FinControl Pro. Documento para fins de consulta pessoal.</p>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {transactions.map((tx) => (
+                  <tr key={tx.id} className="page-break-inside-avoid">
+                    <td className="py-3 px-4 tabular-nums text-slate-400 font-bold">{tx.date}</td>
+                    <td className="py-3 px-4 font-black text-slate-900">{tx.description}</td>
+                    <td className="py-3 px-4 text-slate-500 uppercase font-black text-[8px]">{t.categories[tx.category]}</td>
+                    <td className={`py-3 px-4 text-right font-black tabular-nums ${tx.type === 'Entrada' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {tx.type === 'Entrada' ? '+' : '-'} {formatCurrency(tx.amount)}
+                    </td>
+                  </tr>
+                ))}
+                {transactions.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-12 text-center text-slate-300 font-black italic uppercase tracking-widest">Nenhuma movimentação.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-10 pt-6 border-t border-slate-100 text-center">
+            <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.4em]">Documento gerado digitalmente • FinControl Pro v2.5.0</p>
           </div>
         </div>
       </div>
 
+      {/* DASHBOARD DE CONFIGURAÇÕES (APENAS TELA) */}
       <div className="mb-16 no-print">
         <button 
           onClick={onBack} 
@@ -195,9 +180,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
       </div>
 
       <div className="space-y-10 no-print">
-        {/* Grupos de Configuração */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Idioma */}
           <section className="bg-white/80 dark:bg-white/5 backdrop-blur-3xl p-10 rounded-[48px] border border-slate-200 dark:border-white/10">
             <h2 className="text-xs font-black text-theme uppercase tracking-[0.4em] mb-8 flex items-center gap-4">
               <span className="w-1.5 h-1.5 bg-theme rounded-full animate-ping"></span> {t.language}
@@ -218,7 +201,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
             </div>
           </section>
 
-          {/* Temas Visual */}
           <section className="bg-white/80 dark:bg-white/5 backdrop-blur-3xl p-10 rounded-[48px] border border-slate-200 dark:border-white/10">
             <h2 className="text-xs font-black text-theme uppercase tracking-[0.4em] mb-8 flex items-center gap-4">
                <span className="w-1.5 h-1.5 bg-theme rounded-full animate-ping"></span> {t.palette}
@@ -235,7 +217,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
                   className={`p-5 rounded-3xl border-2 flex items-center justify-between transition-all group ${settings.theme === theme.id ? 'border-theme bg-theme/5' : 'border-transparent bg-slate-50/50 dark:bg-white/5 hover:border-theme/30'}`}
                 >
                   <div className="flex items-center gap-5">
-                    <div className={`w-10 h-10 rounded-2xl ${theme.color} shadow-lg ring-4 ring-white/10 transition-transform group-hover:rotate-12`} />
+                    <div className={`w-10 h-10 rounded-2xl ${theme.color} shadow-lg ring-4 ring-white/10`} />
                     <span className={`text-sm font-black uppercase tracking-widest ${settings.theme === theme.id ? 'text-theme' : `${labelColor}`}`}>
                       {theme.label}
                     </span>
@@ -247,7 +229,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
           </section>
         </div>
 
-        {/* Modo de Visualização */}
         <section className="bg-white/80 dark:bg-white/5 backdrop-blur-3xl p-10 rounded-[48px] border border-slate-200 dark:border-white/10 flex items-center justify-between">
            <div className="flex items-center gap-6">
              <div className="w-16 h-16 rounded-3xl bg-theme/10 flex items-center justify-center text-3xl shadow-inner border border-theme/20">
@@ -270,7 +251,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
            </button>
         </section>
 
-        {/* Gerenciamento Master de Dados */}
         <section className="bg-slate-900 dark:bg-white/5 p-12 rounded-[56px] border border-white/10 shadow-3xl relative overflow-hidden">
           <div className="absolute top-0 right-0 p-10 opacity-5">
             <FCLogo className="w-48 h-48 text-white" />
@@ -280,42 +260,26 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
               <span className="w-2 h-2 bg-theme rounded-full"></span> {language === 'pt' ? 'Central de Arquivos' : 'Files Central'}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <button 
-                onClick={handleExportData}
-                className="flex flex-col items-center gap-6 p-8 bg-white/5 border border-white/10 rounded-[40px] hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all group"
-              >
+              <button onClick={handleExportData} className="flex flex-col items-center gap-6 p-8 bg-white/5 border border-white/10 rounded-[40px] hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all group">
                 <div className="text-4xl transition-transform group-hover:-translate-y-2">📦</div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-emerald-400 text-center">Exportar JSON <br/><span className="text-[8px] opacity-50">(Backup)</span></span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-emerald-400 text-center">Exportar JSON</span>
               </button>
-              
-              <button 
-                onClick={handleExportPDF}
-                className="flex flex-col items-center gap-6 p-8 bg-white/5 border border-white/10 rounded-[40px] hover:bg-indigo-500/10 hover:border-indigo-500/30 transition-all group"
-              >
+              <button onClick={handleExportPDF} className="flex flex-col items-center gap-6 p-8 bg-white/5 border border-white/10 rounded-[40px] hover:bg-indigo-500/10 hover:border-indigo-500/30 transition-all group">
                 <div className="text-4xl transition-transform group-hover:-translate-y-2">📄</div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-indigo-400 text-center">Exportar PDF <br/><span className="text-[8px] opacity-50">(Relatório)</span></span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-indigo-400 text-center">Exportar PDF</span>
               </button>
-
-              <button 
-                onClick={() => fileInputRef.current?.click()}
-                className="flex flex-col items-center gap-6 p-8 bg-white/5 border border-white/10 rounded-[40px] hover:bg-blue-500/10 hover:border-blue-500/30 transition-all group"
-              >
+              <button onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-6 p-8 bg-white/5 border border-white/10 rounded-[40px] hover:bg-blue-500/10 hover:border-blue-500/30 transition-all group">
                 <div className="text-4xl transition-transform group-hover:-translate-y-2">📥</div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-blue-400 text-center">Importar Backup <br/><span className="text-[8px] opacity-50">(Restaurar)</span></span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-blue-400 text-center">Importar Backup</span>
                 <input type="file" ref={fileInputRef} onChange={handleImportData} accept=".json" className="hidden" />
               </button>
-              
-              <button 
-                onClick={handleClearAll}
-                className="flex flex-col items-center gap-6 p-8 bg-rose-500/5 border border-rose-500/10 rounded-[40px] hover:bg-rose-500/20 hover:border-rose-500/30 transition-all group"
-              >
+              <button onClick={handleClearAll} className="flex flex-col items-center gap-6 p-8 bg-rose-500/5 border border-rose-500/10 rounded-[40px] hover:bg-rose-500/20 hover:border-rose-500/30 transition-all group">
                 <div className="text-4xl transition-transform group-hover:rotate-12">💣</div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-rose-500/80 group-hover:text-rose-400 text-center">Nuclear Clean <br/><span className="text-[8px] opacity-50">(Reset Total)</span></span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-rose-500/80 group-hover:text-rose-400 text-center">Reset Total</span>
               </button>
             </div>
-            
             <p className="mt-12 text-[10px] font-bold text-white/20 uppercase tracking-[0.4em] text-center leading-relaxed italic">
-              A FinControl Pro recomenda backups semanais para garantir a integridade da sua soberania financeira.
+              Backups semanais garantem sua soberania financeira.
             </p>
           </div>
         </section>
