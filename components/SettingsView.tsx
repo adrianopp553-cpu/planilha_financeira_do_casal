@@ -33,6 +33,12 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
     URL.revokeObjectURL(url);
   };
 
+  const handleExportPDF = () => {
+    // Redireciona para a vista de resultados e dispara o print (simulado via navegação interna se necessário)
+    // Para esta implementação, como o PDF é visual, informamos ao usuário para usar a aba Resultados ou abrimos o modo de impressão
+    window.print();
+  };
+
   const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -73,7 +79,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
       <div className="mb-12">
         <button 
           onClick={onBack} 
-          className="flex items-center gap-2 text-theme font-black text-xs uppercase tracking-widest mb-4 hover:gap-3 transition-all group"
+          className="flex items-center gap-2 text-theme font-black text-xs uppercase tracking-widest mb-4 hover:gap-3 transition-all group no-print"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -86,58 +92,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
       </div>
 
       <div className="space-y-8">
-        {/* Gerenciamento de Dados */}
-        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md">
-          <h2 className="text-xl font-black text-theme mb-8 flex items-center gap-3">
-            <span className="text-2xl filter drop-shadow-sm">💾</span> {language === 'pt' ? 'Gerenciamento de Dados' : 'Data Management'}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <button 
-              onClick={handleExportData}
-              className="flex flex-col items-center gap-4 p-6 bg-emerald-500/10 dark:bg-emerald-500/20 border-2 border-emerald-500/20 rounded-3xl hover:bg-emerald-500/20 transition-all group"
-            >
-              <span className="text-3xl transition-transform group-hover:-translate-y-1">📤</span>
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 text-center">Exportar Backup</span>
-            </button>
-            <button 
-              onClick={() => fileInputRef.current?.click()}
-              className="flex flex-col items-center gap-4 p-6 bg-blue-500/10 dark:bg-blue-500/20 border-2 border-blue-500/20 rounded-3xl hover:bg-blue-500/20 transition-all group"
-            >
-              <span className="text-3xl transition-transform group-hover:-translate-y-1">📥</span>
-              <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 text-center">Importar Backup</span>
-              <input type="file" ref={fileInputRef} onChange={handleImportData} accept=".json" className="hidden" />
-            </button>
-            <button 
-              onClick={handleClearAll}
-              className="flex flex-col items-center gap-4 p-6 bg-rose-500/10 dark:bg-rose-500/20 border-2 border-rose-500/20 rounded-3xl hover:bg-rose-500/20 transition-all group"
-            >
-              <span className="text-3xl transition-transform group-hover:scale-110">🗑️</span>
-              <span className="text-[10px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400 text-center">Limpar Tudo</span>
-            </button>
-          </div>
-        </section>
-
-        {/* Modo Claro (Toggle Sol) */}
-        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 flex items-center justify-between transition-all hover:shadow-md">
-           <div className="flex items-center gap-5">
-             <div className="w-12 h-12 rounded-2xl bg-theme/15 flex items-center justify-center text-2xl shadow-inner border border-theme/10">☀️</div>
-             <div>
-               <p className={`font-black text-lg leading-tight transition-colors duration-300 ${themeOrWhite}`}>{language === 'pt' ? 'Modo Claro' : 'Light Mode'}</p>
-               <p className={`text-[10px] ${secondaryLabelColor} font-black uppercase tracking-[0.2em] mt-1`}>
-                 {language === 'pt' ? 'Alta Visibilidade' : 'High Visibility'}
-               </p>
-             </div>
-           </div>
-           <button 
-             onClick={() => updateSetting('lightMode', !settings.lightMode)} 
-             className={`w-16 h-9 rounded-full transition-all relative p-1 ${settings.lightMode ? 'bg-theme' : 'bg-slate-300 dark:bg-white/20'}`}
-           >
-             <div className={`w-7 h-7 bg-white rounded-full transition-all shadow-lg ${settings.lightMode ? 'translate-x-7' : 'translate-x-0'}`} />
-           </button>
-        </section>
-
         {/* Idioma */}
-        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md">
+        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md no-print">
           <h2 className="text-xl font-black text-theme mb-8 flex items-center gap-3">
             <span className="text-2xl filter drop-shadow-sm">🌍</span> {t.language}
           </h2>
@@ -157,7 +113,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
         </section>
 
         {/* Paleta de Cores */}
-        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md">
+        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md no-print">
           <h2 className="text-xl font-black text-theme mb-8 flex items-center gap-3">
             <span className="text-2xl filter drop-shadow-sm">🎨</span> {t.palette}
           </h2>
@@ -182,7 +138,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
         </section>
 
         {/* Tamanho da Fonte */}
-        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md">
+        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md no-print">
           <h2 className="text-xl font-black text-theme mb-8 flex items-center gap-3">
             <span className="text-2xl filter drop-shadow-sm">🔍</span> {t.fontSize}
           </h2>
@@ -206,6 +162,74 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
               </button>
             ))}
           </div>
+        </section>
+
+        {/* Modo Claro (Toggle Sol) */}
+        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 flex items-center justify-between transition-all hover:shadow-md no-print">
+           <div className="flex items-center gap-5">
+             <div className="w-12 h-12 rounded-2xl bg-theme/15 flex items-center justify-center text-2xl shadow-inner border border-theme/10">☀️</div>
+             <div>
+               <p className={`font-black text-lg leading-tight transition-colors duration-300 ${themeOrWhite}`}>{language === 'pt' ? 'Modo Claro' : 'Light Mode'}</p>
+               <p className={`text-[10px] ${secondaryLabelColor} font-black uppercase tracking-[0.2em] mt-1`}>
+                 {language === 'pt' ? 'Alta Visibilidade' : 'High Visibility'}
+               </p>
+             </div>
+           </div>
+           <button 
+             onClick={() => updateSetting('lightMode', !settings.lightMode)} 
+             className={`w-16 h-9 rounded-full transition-all relative p-1 ${settings.lightMode ? 'bg-theme' : 'bg-slate-300 dark:bg-white/20'}`}
+           >
+             <div className={`w-7 h-7 bg-white rounded-full transition-all shadow-lg ${settings.lightMode ? 'translate-x-7' : 'translate-x-0'}`} />
+           </button>
+        </section>
+
+        {/* Gerenciamento de Dados - AGORA NO FINAL */}
+        <section className="bg-white/95 dark:bg-white/10 backdrop-blur-3xl p-8 rounded-[32px] shadow-sm border border-slate-200 dark:border-white/20 transition-all hover:shadow-md">
+          <h2 className="text-xl font-black text-theme mb-8 flex items-center gap-3">
+            <span className="text-2xl filter drop-shadow-sm">💾</span> {language === 'pt' ? 'Gerenciamento de Dados' : 'Data Management'}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <button 
+              onClick={handleExportData}
+              className="flex flex-col items-center gap-4 p-6 bg-emerald-500/10 dark:bg-emerald-500/20 border-2 border-emerald-500/20 rounded-3xl hover:bg-emerald-500/20 transition-all group no-print"
+              title="Baixar arquivo JSON para backup ou outro PC"
+            >
+              <span className="text-3xl transition-transform group-hover:-translate-y-1">📤</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 text-center">Exportar Dados (JSON)</span>
+            </button>
+            
+            <button 
+              onClick={handleExportPDF}
+              className="flex flex-col items-center gap-4 p-6 bg-indigo-500/10 dark:bg-indigo-500/20 border-2 border-indigo-500/20 rounded-3xl hover:bg-indigo-500/20 transition-all group no-print"
+              title="Imprimir relatório completo em PDF"
+            >
+              <span className="text-3xl transition-transform group-hover:-translate-y-1">📄</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 text-center">Exportar PDF / Imprimir</span>
+            </button>
+
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="flex flex-col items-center gap-4 p-6 bg-blue-500/10 dark:bg-blue-500/20 border-2 border-blue-500/20 rounded-3xl hover:bg-blue-500/20 transition-all group no-print"
+              title="Importar arquivo JSON de outro PC"
+            >
+              <span className="text-3xl transition-transform group-hover:-translate-y-1">📥</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 text-center">Importar Backup</span>
+              <input type="file" ref={fileInputRef} onChange={handleImportData} accept=".json" className="hidden" />
+            </button>
+            
+            <button 
+              onClick={handleClearAll}
+              className="flex flex-col items-center gap-4 p-6 bg-rose-500/10 dark:bg-rose-500/20 border-2 border-rose-500/20 rounded-3xl hover:bg-rose-500/20 transition-all group no-print"
+            >
+              <span className="text-3xl transition-transform group-hover:scale-110">🗑️</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400 text-center">Limpar Tudo</span>
+            </button>
+          </div>
+          <p className="mt-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center leading-relaxed">
+            {language === 'pt' 
+              ? 'Use JSON para levar seus dados para outro dispositivo. Use PDF para guardar uma cópia física.' 
+              : 'Use JSON to move data to another device. Use PDF for a physical copy.'}
+          </p>
         </section>
       </div>
     </main>
