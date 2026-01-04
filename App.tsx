@@ -5,12 +5,12 @@ import { translations } from './translations';
 import SummaryCards from './components/SummaryCards';
 import TransactionForm from './components/TransactionForm';
 import TransactionTable from './components/TransactionTable';
-import AIAssistant from './components/AIAssistant';
 
-// Carregamento Preguiçoso (Code Splitting)
+// Carregamento Dinâmico (Code Splitting) para componentes pesados
 const FinancialCharts = lazy(() => import('./components/FinancialCharts'));
 const ResultsView = lazy(() => import('./components/ResultsView'));
 const SettingsView = lazy(() => import('./components/SettingsView'));
+const AIAssistant = lazy(() => import('./components/AIAssistant'));
 
 const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -32,9 +32,9 @@ const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
 );
 
 const ViewLoader = () => (
-  <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 animate-in fade-in duration-700">
-    <div className="w-12 h-12 border-4 border-theme/20 border-t-theme rounded-full animate-spin"></div>
-    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-theme/60">Sincronizando Galáxia...</p>
+  <div className="min-h-[40vh] flex flex-col items-center justify-center gap-4 animate-in fade-in duration-700">
+    <div className="w-10 h-10 border-4 border-theme/10 border-t-theme rounded-full animate-spin"></div>
+    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-theme/40">Carregando Módulo...</p>
   </div>
 );
 
@@ -86,7 +86,7 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!isLoaded) return <div className="min-h-screen flex items-center justify-center bg-black text-theme font-black italic tracking-widest animate-pulse">FINCASAL PRO...</div>;
+  if (!isLoaded) return <div className="min-h-screen flex items-center justify-center bg-black text-theme font-black italic tracking-widest animate-pulse uppercase">FinCasal Pro...</div>;
 
   return (
     <div className="min-h-screen flex flex-col relative z-10" style={{ fontFamily: 'var(--app-font)' }}>
@@ -123,7 +123,11 @@ const App: React.FC = () => {
                 <SummaryCards summary={summary} language={settings.language} />
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mt-12">
                   <div className="lg:col-span-8 space-y-12">
-                    <AIAssistant transactions={transactions} language={settings.language} />
+                    {/* AIAssistant agora carrega em Suspense para isolar o SDK do Gemini */}
+                    <Suspense fallback={<div className="h-40 bg-gray-100 dark:bg-white/5 rounded-[40px] animate-pulse flex items-center justify-center text-[10px] font-black uppercase tracking-widest text-gray-400">Iniciando IA...</div>}>
+                      <AIAssistant transactions={transactions} language={settings.language} />
+                    </Suspense>
+                    
                     <div id="new-transaction-section">
                       <TransactionForm 
                         onAdd={(tx) => setTransactions(prev => [tx, ...prev])} 
@@ -142,7 +146,9 @@ const App: React.FC = () => {
                   </div>
                   <div className="lg:col-span-4">
                     <div className="bg-white dark:bg-black/30 p-8 rounded-[40px] shadow-sm border border-black/5 dark:border-white/10 sticky top-28 backdrop-blur-3xl transition-all duration-500 hover:shadow-2xl hover:border-theme/30">
-                      <FinancialCharts transactions={transactions} language={settings.language} />
+                      <Suspense fallback={<div className="h-64 flex items-center justify-center text-[10px] font-black text-theme/40 uppercase tracking-widest">Renderizando Gráficos...</div>}>
+                        <FinancialCharts transactions={transactions} language={settings.language} />
+                      </Suspense>
                     </div>
                   </div>
                 </div>
