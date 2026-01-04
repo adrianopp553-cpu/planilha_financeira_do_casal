@@ -1,8 +1,6 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { Transaction, AIAnalysisResult } from "../types";
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const getBasePrompt = (transactions: Transaction[]) => `
   Transações recentes do casal:
@@ -12,6 +10,7 @@ const getBasePrompt = (transactions: Transaction[]) => `
 `;
 
 export const analyzeFinances = async (transactions: Transaction[]): Promise<AIAnalysisResult> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
   const model = 'gemini-3-flash-preview';
   const prompt = `${getBasePrompt(transactions)}\nForneça uma análise rápida e 3 dicas curtas para este casal.`;
 
@@ -33,6 +32,7 @@ export const analyzeFinances = async (transactions: Transaction[]): Promise<AIAn
 };
 
 export const deepThinkingAnalysis = async (transactions: Transaction[]): Promise<AIAnalysisResult> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
   const model = 'gemini-3-pro-preview';
   const prompt = `
     ${getBasePrompt(transactions)}
@@ -60,6 +60,7 @@ export const deepThinkingAnalysis = async (transactions: Transaction[]): Promise
 };
 
 export const marketSearchAnalysis = async (transactions: Transaction[]): Promise<AIAnalysisResult> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
   const model = 'gemini-3-flash-preview';
   const prompt = `
     Baseado nos gastos do casal: ${transactions.slice(0, 5).map(t => t.category).join(', ')}.

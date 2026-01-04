@@ -21,7 +21,6 @@
             --nebula-2: rgba(236, 72, 153, 0.08);
         }
         
-        /* MODO CLARO: Contraste Máximo */
         body { 
             font-family: var(--app-font); 
             scroll-behavior: smooth; 
@@ -46,7 +45,6 @@
             --bg-dark: #000402; --nebula-1: rgba(16, 185, 129, 0.2); --nebula-2: rgba(34, 197, 94, 0.1);
         }
 
-        /* MODO NOTURNO: Vácuo Estelar Denso e Nebulosas */
         body.dark-mode { 
             background-color: var(--bg-dark) !important; 
             background-image: 
@@ -58,7 +56,6 @@
             color: #ffffff !important; 
         }
 
-        /* Camadas de Nebulosa (Poeira Cósmica Animada) */
         body.dark-mode::before {
             content: "";
             position: fixed;
@@ -74,7 +71,6 @@
             opacity: 0.7;
         }
 
-        /* Camada de Brilho Estelar Adicional */
         body.dark-mode::after {
             content: "";
             position: fixed;
@@ -103,7 +99,6 @@
             50% { opacity: 0.8; filter: blur(0px); }
         }
 
-        /* Glassmorphism Ultra Nítido no Modo Noturno */
         body.dark-mode .bg-white { 
             background-color: rgba(0, 0, 0, 0.7) !important; 
             border-color: rgba(255, 255, 255, 0.15) !important;
@@ -112,11 +107,7 @@
             box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95);
         }
 
-        /* Garantia de contraste no Modo Claro */
         body:not(.dark-mode) .text-gray-900 { color: #0f172a !important; font-weight: 800; }
-        body:not(.dark-mode) .text-gray-800 { color: #1e293b !important; font-weight: 700; }
-        body:not(.dark-mode) .text-gray-600 { color: #475569 !important; font-weight: 600; }
-        body:not(.dark-mode) .text-gray-500 { color: #64748b !important; font-weight: 500; }
         body:not(.dark-mode) .bg-white { background-color: #ffffff !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
 
         body.dark-mode .text-gray-900, 
@@ -127,32 +118,15 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        body.dark-mode .text-gray-600,
-        body.dark-mode .text-gray-500,
-        body.dark-mode .text-slate-400 {
-            color: rgba(255, 255, 255, 0.8) !important;
-        }
-
         @media print {
             .no-print { display: none !important; }
             body { background-color: white !important; color: black !important; background-image: none !important; }
             body::before, body::after { display: none; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            @page { margin: 1.5cm; }
         }
 
         .text-theme { color: var(--primary) !important; }
         .bg-theme { background-color: var(--primary) !important; }
-        .bg-theme-light { background-color: var(--primary-light) !important; }
-        .border-theme { border-color: var(--primary) !important; }
-        .border-theme-light { border-color: var(--primary-border) !important; }
-        .shadow-theme { box-shadow: 0 12px 30px -8px var(--primary-shadow) !important; }
-
-        /* Scrollbar Personalizada */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        body.dark-mode ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, var(--primary), var(--primary-dark)); box-shadow: 0 0 10px var(--primary); }
     </style>
     <script type="importmap">
 {

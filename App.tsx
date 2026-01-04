@@ -6,11 +6,11 @@ import SummaryCards from './components/SummaryCards';
 import TransactionForm from './components/TransactionForm';
 import TransactionTable from './components/TransactionTable';
 
-// Carregamento Dinâmico (Code Splitting) para componentes pesados
+// Carregamento Preguiçoso apenas para componentes pesados de verdade
 const FinancialCharts = lazy(() => import('./components/FinancialCharts'));
+const AIAssistant = lazy(() => import('./components/AIAssistant'));
 const ResultsView = lazy(() => import('./components/ResultsView'));
 const SettingsView = lazy(() => import('./components/SettingsView'));
-const AIAssistant = lazy(() => import('./components/AIAssistant'));
 
 const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -32,9 +32,15 @@ const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
 );
 
 const ViewLoader = () => (
-  <div className="min-h-[40vh] flex flex-col items-center justify-center gap-4 animate-in fade-in duration-700">
-    <div className="w-10 h-10 border-4 border-theme/10 border-t-theme rounded-full animate-spin"></div>
-    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-theme/40">Carregando Módulo...</p>
+  <div className="min-h-[50vh] flex flex-col items-center justify-center gap-6 animate-in fade-in duration-500">
+    <div className="w-12 h-12 border-4 border-theme/20 border-t-theme rounded-full animate-spin"></div>
+    <div className="text-center">
+      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-theme/60 mb-2">Sincronizando Galáxia Financeira...</p>
+      <div className="w-48 h-1 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
+        <div className="h-full bg-theme animate-[progress_2s_infinite_linear]"></div>
+      </div>
+    </div>
+    <style>{`@keyframes progress { 0% { width: 0%; } 50% { width: 70%; } 100% { width: 100%; } }`}</style>
   </div>
 );
 
@@ -55,22 +61,32 @@ const App: React.FC = () => {
   const t = translations[settings.language];
 
   useEffect(() => {
-    const savedData = localStorage.getItem('fincasal_data');
-    const savedSettings = localStorage.getItem('fincasal_settings');
-    if (savedData) try { setTransactions(JSON.parse(savedData)); } catch (e) { console.error(e); }
-    if (savedSettings) try { setSettings(JSON.parse(savedSettings)); } catch (e) { console.error(e); }
-    setIsLoaded(true);
+    const loadSaved = () => {
+      const savedData = localStorage.getItem('fincasal_data');
+      const savedSettings = localStorage.getItem('fincasal_settings');
+      if (savedData) try { setTransactions(JSON.parse(savedData)); } catch (e) { console.error(e); }
+      if (savedSettings) try { setSettings(prev => ({...prev, ...JSON.parse(savedSettings)})); } catch (e) { console.error(e); }
+      setIsLoaded(true);
+    };
+    loadSaved();
   }, []);
 
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('fincasal_data', JSON.stringify(transactions));
       localStorage.setItem('fincasal_settings', JSON.stringify(settings));
+      
       const root = document.documentElement;
-      const fontMap = { sans: "'Plus Jakarta Sans', sans-serif", serif: "'Playfair Display', serif", inter: "'Inter', sans-serif" };
+      const fontMap = { 
+        sans: "'Plus Jakarta Sans', sans-serif", 
+        serif: "'Playfair Display', serif", 
+        inter: "'Inter', sans-serif" 
+      };
       root.style.setProperty('--app-font', fontMap[settings.fontFamily]);
+      
       const sizeMap = { small: '14px', medium: '16px', large: '18px' };
       root.style.fontSize = sizeMap[settings.fontSize];
+      
       document.body.className = `theme-${settings.theme} ${!settings.lightMode ? 'dark-mode' : ''} transition-all duration-700 min-h-screen`;
     }
   }, [transactions, settings, isLoaded]);
@@ -86,36 +102,41 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!isLoaded) return <div className="min-h-screen flex items-center justify-center bg-black text-theme font-black italic tracking-widest animate-pulse uppercase">FinCasal Pro...</div>;
+  if (!isLoaded) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black gap-6">
+      <FCLogo className="w-16 h-16 text-indigo-500 animate-pulse" />
+      <p className="text-theme font-black italic tracking-[0.5em] text-xs uppercase">FINCASAL PRO...</p>
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex flex-col relative z-10" style={{ fontFamily: 'var(--app-font)' }}>
       <nav className="fixed top-0 w-full z-50 border-b border-black/5 dark:border-white/10 bg-white/70 dark:bg-black/40 backdrop-blur-3xl transition-all duration-500 no-print">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigateTo('home')}>
-            <div className="w-12 h-12 bg-theme rounded-[16px] flex items-center justify-center shadow-lg shadow-theme/30 transition-all group-hover:scale-110 group-hover:rotate-3 active:scale-95">
+            <div className="w-12 h-12 bg-theme rounded-[16px] flex items-center justify-center shadow-lg shadow-theme/30 transition-all group-hover:scale-110 group-hover:rotate-3">
               <FCLogo className="h-8 w-8 text-white" />
             </div>
             <span className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tighter">Fin<span className="text-theme">Casal</span></span>
           </div>
-          <div className="hidden md:flex items-center gap-1 p-1 bg-gray-200/50 dark:bg-white/5 rounded-[20px] border border-black/5 dark:border-white/10 backdrop-blur-md">
-            <button onClick={() => navigateTo('home')} className={`px-6 py-2.5 rounded-[16px] text-[11px] font-black uppercase tracking-widest transition-all ${view === 'home' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-xl' : 'text-gray-500 dark:text-white/60 hover:text-theme dark:hover:text-white'}`}>{t.dashboard}</button>
-            <button onClick={() => navigateTo('results')} className={`px-6 py-2.5 rounded-[16px] text-[11px] font-black uppercase tracking-widest transition-all ${view === 'results' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-xl' : 'text-gray-500 dark:text-white/60 hover:text-theme dark:hover:text-white'}`}>{t.results}</button>
-            <button onClick={() => navigateTo('settings')} className={`p-2.5 rounded-[16px] transition-all ${view === 'settings' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-xl' : 'text-gray-500 dark:text-white/60 hover:text-theme dark:hover:text-white'}`}><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /></svg></button>
+          <div className="hidden md:flex items-center gap-1 p-1 bg-gray-200/50 dark:bg-white/5 rounded-[20px] border border-black/5 dark:border-white/10">
+            <button onClick={() => navigateTo('home')} className={`px-6 py-2.5 rounded-[16px] text-[11px] font-black uppercase tracking-widest transition-all ${view === 'home' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-xl' : 'text-gray-500 dark:text-white/60'}`}>{t.dashboard}</button>
+            <button onClick={() => navigateTo('results')} className={`px-6 py-2.5 rounded-[16px] text-[11px] font-black uppercase tracking-widest transition-all ${view === 'results' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-xl' : 'text-gray-500 dark:text-white/60'}`}>{t.results}</button>
+            <button onClick={() => navigateTo('settings')} className={`p-2.5 rounded-[16px] transition-all ${view === 'settings' ? 'bg-white dark:bg-theme text-theme dark:text-white shadow-xl' : 'text-gray-500 dark:text-white/60'}`}><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /></svg></button>
           </div>
         </div>
       </nav>
 
-      <div className="flex-1 pb-24 md:pb-0">
+      <div className="flex-1 pb-24 md:pb-0 min-h-screen">
         <Suspense fallback={<ViewLoader />}>
           {view === 'home' ? (
-            <>
+            <div className="animate-in fade-in duration-1000">
               <section className="pt-48 pb-24 px-6 text-center relative">
-                <h1 className="text-5xl md:text-8xl font-black text-gray-900 dark:text-white mb-8 tracking-tighter leading-[0.95] animate-in fade-in slide-in-from-top-10 duration-1000">
+                <h1 className="text-5xl md:text-8xl font-black text-gray-900 dark:text-white mb-8 tracking-tighter leading-[0.95]">
                   {t.harmony} <br />
                   <span className="text-theme" style={{ filter: 'drop-shadow(0 0 15px var(--primary-shadow))' }}>{t.relationship}</span>
                 </h1>
-                <p className="text-xl text-gray-600 dark:text-white/80 max-w-2xl mx-auto mb-14 font-medium leading-relaxed drop-shadow-sm">{t.subtitle}</p>
+                <p className="text-xl text-gray-600 dark:text-white/80 max-w-2xl mx-auto mb-14 font-medium leading-relaxed">{t.subtitle}</p>
                 <button onClick={() => document.getElementById('dash-content')?.scrollIntoView({ behavior: 'smooth' })} className="px-14 py-7 bg-theme text-white font-black uppercase tracking-widest text-xs rounded-full shadow-2xl shadow-theme/40 hover:scale-105 active:scale-95 transition-all duration-500">{t.startPlanning}</button>
               </section>
 
@@ -123,11 +144,9 @@ const App: React.FC = () => {
                 <SummaryCards summary={summary} language={settings.language} />
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mt-12">
                   <div className="lg:col-span-8 space-y-12">
-                    {/* AIAssistant agora carrega em Suspense para isolar o SDK do Gemini */}
-                    <Suspense fallback={<div className="h-40 bg-gray-100 dark:bg-white/5 rounded-[40px] animate-pulse flex items-center justify-center text-[10px] font-black uppercase tracking-widest text-gray-400">Iniciando IA...</div>}>
+                    <Suspense fallback={<div className="h-40 bg-gray-100 dark:bg-white/5 rounded-[40px] animate-pulse"></div>}>
                       <AIAssistant transactions={transactions} language={settings.language} />
                     </Suspense>
-                    
                     <div id="new-transaction-section">
                       <TransactionForm 
                         onAdd={(tx) => setTransactions(prev => [tx, ...prev])} 
@@ -145,15 +164,15 @@ const App: React.FC = () => {
                     />
                   </div>
                   <div className="lg:col-span-4">
-                    <div className="bg-white dark:bg-black/30 p-8 rounded-[40px] shadow-sm border border-black/5 dark:border-white/10 sticky top-28 backdrop-blur-3xl transition-all duration-500 hover:shadow-2xl hover:border-theme/30">
-                      <Suspense fallback={<div className="h-64 flex items-center justify-center text-[10px] font-black text-theme/40 uppercase tracking-widest">Renderizando Gráficos...</div>}>
+                    <div className="bg-white dark:bg-black/30 p-8 rounded-[40px] shadow-sm border border-black/5 dark:border-white/10 sticky top-28 backdrop-blur-3xl">
+                      <Suspense fallback={<div className="h-64 flex items-center justify-center text-xs text-theme/40 font-black uppercase tracking-widest">Calculando Gráficos...</div>}>
                         <FinancialCharts transactions={transactions} language={settings.language} />
                       </Suspense>
                     </div>
                   </div>
                 </div>
               </main>
-            </>
+            </div>
           ) : view === 'results' ? (
             <ResultsView transactions={transactions} summary={summary} onBack={() => navigateTo('home')} language={settings.language} lightMode={settings.lightMode} />
           ) : (
@@ -162,39 +181,12 @@ const App: React.FC = () => {
         </Suspense>
       </div>
 
-      <footer className="bg-gray-50/50 dark:bg-black/40 border-t border-black/5 dark:border-white/10 py-20 px-6 no-print backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16 text-center md:text-left">
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center justify-center md:justify-start gap-4 mb-8">
-              <div className="w-14 h-14 bg-theme/10 rounded-[18px] flex items-center justify-center text-theme shadow-inner border border-theme/10">
-                <FCLogo className="h-9 w-9" />
-              </div>
-              <span className="text-2xl font-black text-gray-900 dark:text-white tracking-tighter uppercase">Fin<span className="text-theme">Casal</span></span>
-            </div>
-            <p className="text-gray-500 dark:text-white/60 text-base max-w-sm font-medium leading-relaxed mx-auto md:mx-0">O futuro financeiro do seu relacionamento elevado a uma nova dimensão. Gestão inteligente para quem planeja as estrelas.</p>
-          </div>
-          <div>
-            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-white/30 mb-8">Navegação</h4>
-            <ul className="space-y-5">
-              <li><button onClick={() => navigateTo('home')} className="text-sm font-bold text-gray-600 dark:text-white/70 hover:text-theme transition-colors">{t.dashboard}</button></li>
-              <li><button onClick={() => navigateTo('results')} className="text-sm font-bold text-gray-600 dark:text-white/70 hover:text-theme transition-colors">{t.results}</button></li>
-              <li><button onClick={() => navigateTo('settings')} className="text-sm font-bold text-gray-600 dark:text-white/70 hover:text-theme transition-colors">{t.settings}</button></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-white/30 mb-8">Legais</h4>
-            <ul className="space-y-5">
-              <li className="text-sm font-bold text-gray-600 dark:text-white/70 hover:text-theme cursor-pointer transition-colors">Privacidade</li>
-              <li className="text-sm font-bold text-gray-600 dark:text-white/70 hover:text-theme cursor-pointer transition-colors">Termos de Uso</li>
-              <li className="text-sm font-bold text-gray-600 dark:text-white/70 hover:text-theme cursor-pointer transition-colors">Garantia</li>
-            </ul>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto border-t border-black/5 dark:border-white/10 mt-20 pt-10 text-center">
+      <footer className="bg-gray-50/50 dark:bg-black/40 border-t border-black/5 dark:border-white/10 py-20 px-6 no-print">
+        <div className="max-w-7xl mx-auto border-t border-black/5 dark:border-white/10 pt-10 text-center">
           <p className="text-[11px] text-gray-400 dark:text-white/20 font-black uppercase tracking-[0.5em]">© 2025 FINCASAL. STELLAR FINANCIAL MANAGEMENT.</p>
         </div>
       </footer>
-
+      
       <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-white/80 dark:bg-black/60 backdrop-blur-3xl rounded-full border border-black/5 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.4)] z-50 py-4 flex items-center justify-around no-print">
         <button onClick={() => navigateTo('home')} className={`flex flex-col items-center gap-1.5 ${view === 'home' ? 'text-theme' : 'text-gray-400'}`}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span className="text-[9px] font-black uppercase tracking-widest">{t.dashboard}</span></button>
         <button onClick={() => navigateTo('results')} className={`flex flex-col items-center gap-1.5 ${view === 'results' ? 'text-theme' : 'text-gray-400'}`}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg><span className="text-[9px] font-black uppercase tracking-widest">Análise</span></button>
