@@ -19,6 +19,32 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAdd, onUpdate, edit
   const [type, setType] = useState<TransactionType>(TransactionType.EXPENSE);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // Carregar rascunho do localStorage apenas na montagem inicial
+  useEffect(() => {
+    if (!editingTransaction) {
+      const savedDraft = localStorage.getItem('fincasal_draft');
+      if (savedDraft) {
+        try {
+          const draft = JSON.parse(savedDraft);
+          setDescription(draft.description || '');
+          setAmount(draft.amount || '');
+          setCategory(draft.category || '');
+          setType(draft.type || TransactionType.EXPENSE);
+        } catch (e) {
+          console.error("Erro ao carregar rascunho", e);
+        }
+      }
+    }
+  }, []);
+
+  // Salvar rascunho sempre que os campos mudarem (se não estiver editando)
+  useEffect(() => {
+    if (!editingTransaction) {
+      const draft = { description, amount, category, type };
+      localStorage.setItem('fincasal_draft', JSON.stringify(draft));
+    }
+  }, [description, amount, category, type, editingTransaction]);
+
   useEffect(() => {
     if (editingTransaction) {
       setDescription(editingTransaction.description);
@@ -26,7 +52,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAdd, onUpdate, edit
       setCategory(editingTransaction.category);
       setType(editingTransaction.type);
     } else {
-      resetForm();
+      // Quando paramos de editar, voltamos para o que estava no rascunho ou resetamos
+      // Mas o useEffect do mount já lida com o rascunho inicial.
     }
   }, [editingTransaction]);
 
@@ -35,6 +62,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAdd, onUpdate, edit
     setAmount('');
     setCategory('');
     setType(TransactionType.EXPENSE);
+    localStorage.removeItem('fincasal_draft');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -56,7 +84,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAdd, onUpdate, edit
 
     editingTransaction && onUpdate ? onUpdate(transactionData) : onAdd(transactionData);
     setIsSuccess(true);
-    if (!editingTransaction) resetForm();
+    resetForm(); // Limpa rascunho após sucesso
+    if (onCancelEdit) onCancelEdit();
     setTimeout(() => setIsSuccess(false), 2000);
   };
 
@@ -65,7 +94,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAdd, onUpdate, edit
       <div className="flex items-center justify-between mb-10">
         <div>
           <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{editingTransaction ? t.adjustRecord : t.newRecord}</h2>
-          <p className="text-sm text-gray-400 font-medium mt-1">{language === 'pt' ? 'Mantenha as finanças em dia, amor.' : 'Keep finances up to date, love.'}</p>
+          <p className="text-sm text-gray-400 font-medium mt-1">
+            {editingTransaction 
+              ? (language === 'pt' ? 'Alterando um registro existente.' : 'Changing an existing record.')
+              : (language === 'pt' ? 'Seu rascunho é salvo automaticamente.' : 'Your draft is saved automatically.')}
+          </p>
         </div>
         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${editingTransaction ? 'bg-theme text-white' : 'bg-theme-light dark:bg-theme/20 text-theme'}`}>
            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -119,8 +152,16 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAdd, onUpdate, edit
         
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-theme-light dark:border-white/10">
           <div className="flex flex-col">
-            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-[0.15em]">{language === 'pt' ? 'Seguro e Privado.' : 'Safe & Private.'}</p>
-            {editingTransaction && <button type="button" onClick={onCancelEdit} className="text-xs text-theme font-black uppercase tracking-widest mt-2 hover:underline text-left">{language === 'pt' ? 'Descartar' : 'Discard'}</button>}
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-[0.15em]">{language === 'pt' ? 'Seu progresso não será perdido.' : 'Your progress won\'t be lost.'}</p>
+            {editingTransaction && (
+              <button 
+                type="button" 
+                onClick={() => { resetForm(); onCancelEdit && onCancelEdit(); }} 
+                className="text-xs text-theme font-black uppercase tracking-widest mt-2 hover:underline text-left"
+              >
+                {language === 'pt' ? 'Cancelar Edição' : 'Cancel Edit'}
+              </button>
+            )}
           </div>
           <button type="submit" className={`relative w-full md:w-auto px-20 py-6 font-black rounded-3xl shadow-2xl transition-all duration-500 flex items-center justify-center gap-4 group overflow-hidden ${isSuccess ? 'bg-emerald-600 text-white shadow-emerald-900/40' : 'bg-theme text-white shadow-theme hover:brightness-110'}`}>
             {isSuccess ? <span>✅ {language === 'pt' ? 'Concluído!' : 'Done!'}</span> : <><span className="relative z-10 uppercase tracking-widest text-sm">{editingTransaction ? t.update : t.confirm}</span><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 group-hover:translate-x-2 transition-transform relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></>}
