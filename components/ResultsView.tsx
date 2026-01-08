@@ -57,7 +57,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
   const handleExportPDF = () => {
     const oldTitle = document.title;
     const dateStr = new Date().toLocaleDateString(language === 'pt' ? 'pt-BR' : 'en-US').replace(/\//g, '-');
-    document.title = `FinControl_Report_${dateStr}`;
+    document.title = `Relatorio_Financeiro_FinControl_${dateStr}`;
     setTimeout(() => {
       window.print();
       document.title = oldTitle;
@@ -67,104 +67,133 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
   return (
     <main className="pt-32 pb-40 px-6 max-w-7xl mx-auto animate-in fade-in duration-500">
       
-      {/* SEÇÃO DE IMPRESSÃO - DOCUMENTO OFICIAL ÚNICO */}
+      {/* SEÇÃO DE IMPRESSÃO - DOCUMENTO DE ALTO NÍVEL (CONSULTORIA) */}
       <div className="hidden print:block w-full text-black bg-white font-sans">
-        {/* Cabeçalho de Auditoria */}
-        <div className="flex justify-between items-start border-b-4 border-black pb-8 mb-10">
-          <div className="flex items-center gap-6">
-            <FCLogo className="w-16 h-16 text-black" />
+        {/* Cabeçalho Executivo */}
+        <div className="flex justify-between items-start border-b-[8px] border-theme pb-10 mb-12">
+          <div className="flex items-center gap-8">
+            <div className="text-theme">
+              <FCLogo className="w-24 h-24" />
+            </div>
             <div>
-              <h1 className="text-4xl font-black uppercase tracking-tighter leading-none">Relatório de Gestão</h1>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-2">Plataforma FinControl Pro v2.5 • Auditoria Digital de Fluxo</p>
+              <h1 className="text-5xl font-black text-theme tracking-tighter leading-none uppercase">Relatório de Saúde Financeira</h1>
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.5em] mt-3">Análise Prospectiva & Inteligência de Dados • Pro Edition</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <span className="bg-black text-white px-3 py-1 text-[9px] font-black uppercase tracking-widest mb-3">Documento Original</span>
-            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Referência de Emissão</p>
-            <p className="text-xl font-black tabular-nums">{new Date().toLocaleDateString()}</p>
+            <div className="bg-theme text-white px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg mb-4">Certificação de Integridade</div>
+            <p className="text-3xl font-black tabular-nums leading-none">{new Date().toLocaleDateString()}</p>
           </div>
         </div>
 
-        {/* Resumo Consolidado (Bordas fortes para contraste) */}
-        <div className="grid grid-cols-3 gap-0 mb-12 border-2 border-black divide-x-2 divide-black">
-          <div className="p-8 text-center bg-white">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Total Receitas</p>
+        {/* Dash de Resumo (Cards) */}
+        <div className="grid grid-cols-3 gap-6 mb-12">
+          <div className="p-8 rounded-[32px] border-2 border-theme/20 bg-theme/5">
+            <p className="text-[9px] font-black uppercase tracking-widest text-theme opacity-60 mb-2">Fluxo de Entrada</p>
             <p className="text-3xl font-black text-emerald-600 tabular-nums">{formatCurrency(summary.totalIncome)}</p>
           </div>
-          <div className="p-8 text-center bg-white">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Total Despesas</p>
-            <p className="text-3xl font-black text-rose-600 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
+          <div className="p-8 rounded-[32px] border-2 border-rose-100 bg-rose-50/30">
+            <p className="text-[9px] font-black uppercase tracking-widest text-rose-500 mb-2">Fluxo de Saída</p>
+            <p className="text-3xl font-black text-rose-500 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
           </div>
-          <div className="p-8 text-center bg-slate-100">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Saldo Final</p>
-            <p className={`text-3xl font-black tabular-nums ${summary.balance >= 0 ? 'text-black' : 'text-rose-700'}`}>
-              {formatCurrency(summary.balance)}
-            </p>
+          <div className="p-8 rounded-[32px] border-2 border-theme bg-theme text-white shadow-xl">
+            <p className="text-[9px] font-black uppercase tracking-widest opacity-80 mb-2">Resultado Líquido</p>
+            <p className="text-3xl font-black tabular-nums">{formatCurrency(summary.balance)}</p>
           </div>
         </div>
 
-        {/* Plano da IA (Formatação de Documento) */}
-        <div className="mb-12 border-l-8 border-black pl-8 py-2">
-          <h2 className="text-sm font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-3">
-            <span className="w-2 h-2 bg-black rounded-full"></span> Análise Estratégica Gemini AI
-          </h2>
-          {aiPlan ? (
-            <div 
-              className="text-base font-bold leading-relaxed text-slate-800 space-y-4"
-              dangerouslySetInnerHTML={{ __html: aiPlan.text.replace(/<b>/g, '<b class="text-black font-black uppercase block mt-6 mb-2 text-sm tracking-wide">') }} 
-            />
-          ) : (
-            <p className="italic text-slate-400">Análise de IA não disponível para este ciclo.</p>
-          )}
-        </div>
+        {/* Infográficos Nativos no PDF */}
+        <div className="grid grid-cols-2 gap-10 mb-16">
+          <div className="bg-slate-50 p-10 rounded-[40px] border border-slate-100">
+            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-theme mb-8 flex items-center gap-3">
+              <span className="w-2 h-2 bg-theme rounded-full"></span> Composição de Despesas
+            </h2>
+            <div className="h-64">
+              <Suspense fallback={null}>
+                <FinancialCharts transactions={transactions} language={language} />
+              </Suspense>
+            </div>
+          </div>
 
-        {/* Tabela de Transações (Minimalismo de Contraste) */}
-        <div className="mt-16">
-          <h2 className="text-xs font-black uppercase tracking-[0.4em] mb-6 text-black">Extrato de Movimentação</h2>
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="border-y-2 border-black bg-slate-50">
-                <th className="py-4 px-4 text-left text-[9px] font-black uppercase text-slate-500">Data</th>
-                <th className="py-4 px-4 text-left text-[9px] font-black uppercase text-slate-500">Descrição Técnica</th>
-                <th className="py-4 px-4 text-left text-[9px] font-black uppercase text-slate-500">Categoria</th>
-                <th className="py-4 px-4 text-right text-[9px] font-black uppercase text-slate-500">Valor Operacional</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {transactions.map(tx => (
-                <tr key={tx.id} className="page-break-inside-avoid">
-                  <td className="py-4 px-4 text-[10px] font-bold text-slate-400 tabular-nums">{tx.date}</td>
-                  <td className="py-4 px-4 text-xs font-black text-black">{tx.description}</td>
-                  <td className="py-4 px-4 text-[9px] font-black text-slate-500 uppercase">{tx.category}</td>
-                  <td className={`py-4 px-4 text-right text-xs font-black tabular-nums ${tx.type === 'Entrada' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                    {tx.type === 'Entrada' ? '+' : '-'} {formatCurrency(tx.amount)}
-                  </td>
-                </tr>
+          <div className="bg-slate-50 p-10 rounded-[40px] border border-slate-100">
+            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-theme mb-8 flex items-center gap-3">
+              <span className="w-2 h-2 bg-theme rounded-full"></span> Maiores Ofensores (Top 5)
+            </h2>
+            <div className="space-y-4">
+              {topExpenses.map((t, idx) => (
+                <div key={t.id} className="flex items-center justify-between p-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <span className="text-theme font-black text-sm">#0{idx+1}</span>
+                    <div>
+                      <p className="text-xs font-black text-slate-800">{t.description}</p>
+                      <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{t.category}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs font-black text-rose-500">{formatCurrency(t.amount)}</p>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
 
-        {/* Rodapé de Autenticidade Digital */}
-        <div className="mt-20 pt-10 border-t border-slate-200 flex justify-between items-center opacity-60">
-           <div className="flex gap-10">
+        {/* Insights da Consultoria Gemini AI (Layout Visual) */}
+        <div className="mb-16">
+          <h2 className="text-xs font-black uppercase tracking-[0.5em] text-theme mb-10 flex items-center gap-4">
+            <span className="flex-1 h-[2px] bg-theme/20"></span> ESTRATÉGIA RECOMENDADA <span className="flex-1 h-[2px] bg-theme/20"></span>
+          </h2>
+          <div className="grid grid-cols-1 gap-8">
+            {aiPlan ? (
+              <div 
+                className="text-lg font-bold leading-relaxed text-slate-700 p-12 bg-theme/5 border-2 border-theme/10 rounded-[48px] relative overflow-hidden"
+                dangerouslySetInnerHTML={{ 
+                  __html: aiPlan.text
+                    .replace(/<b>/g, '<b class="text-theme" style="font-weight:900; text-transform:uppercase; display:block; margin-top:2.5rem; margin-bottom:1rem; font-size:16px; letter-spacing:2px; border-bottom: 2px solid currentColor; width: fit-content; padding-bottom: 4px">')
+                    .replace(/<li>/g, '<li style="margin-bottom: 1rem; list-style-type: none; background: white; padding: 1.25rem; border-radius: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05)">')
+                }} 
+              />
+            ) : (
+              <div className="py-20 text-center border-4 border-dashed border-slate-100 rounded-[48px] text-slate-300 font-black uppercase tracking-widest">
+                Gerando recomendações estratégicas...
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Dica de Ouro / Conclusão Estratégica */}
+        <div className="mt-20 p-12 bg-slate-900 rounded-[48px] text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-10 opacity-10">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-40 h-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 className="text-theme font-black uppercase tracking-[0.5em] text-[10px] mb-6">Dica de Ouro de Encerramento</h3>
+          <p className="text-2xl font-black leading-tight italic max-w-2xl">
+            {summary.balance >= 0 
+              ? "O lucro não é o que resta, é o que você prioriza primeiro. Considere automatizar 15% deste saldo para investimentos de longo prazo hoje mesmo."
+              : "Crises são oportunidades de simplificação. Foque nos 'Ofensores' listados acima; reduzir apenas a maior categoria em 20% mudará seu saldo para o azul no próximo ciclo."}
+          </p>
+        </div>
+
+        {/* Footer de Autenticidade */}
+        <div className="mt-24 pt-10 border-t-2 border-slate-100 flex justify-between items-center opacity-60">
+           <div className="flex gap-12">
              <div>
-               <p className="text-[7px] font-black uppercase tracking-widest text-slate-400 mb-1">Hash de Integridade</p>
-               <p className="text-[9px] font-mono text-slate-900">FC-{Math.random().toString(36).substr(2, 9).toUpperCase()}</p>
+               <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Hash de Auditoria</p>
+               <p className="text-[10px] font-mono text-slate-900 font-bold">FCP-{Math.random().toString(36).substr(2, 6).toUpperCase()}-INF</p>
              </div>
              <div>
-               <p className="text-[7px] font-black uppercase tracking-widest text-slate-400 mb-1">Protocolo</p>
-               <p className="text-[9px] font-mono text-slate-900">DGT-992.001-X</p>
+               <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Status do Ciclo</p>
+               <p className="text-[10px] font-black text-theme uppercase">Finalizado & Analisado</p>
              </div>
            </div>
            <div className="text-right">
-             <p className="text-[8px] font-black uppercase tracking-[0.3em] text-black">FinControl Pro Certified Report</p>
-             <p className="text-[7px] font-bold text-slate-400 mt-1 uppercase">Este documento possui validade informativa e gerencial.</p>
+             <p className="text-[9px] font-black text-theme uppercase tracking-[0.2em]">FinControl Pro Enterprise Edition</p>
+             <p className="text-[8px] font-bold text-slate-400 mt-1 uppercase">Powered by Gemini Strategic AI Engine</p>
            </div>
         </div>
       </div>
 
-      {/* DASHBOARD DE TELA (NO-PRINT) */}
+      {/* TELA DE RESULTADOS (Interface Web - No Print) */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 no-print">
         <div>
           <button onClick={onBack} className="flex items-center gap-2 text-theme font-black text-xs uppercase tracking-widest mb-4 hover:gap-3 transition-all">
@@ -184,7 +213,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
             {language === 'pt' ? 'Exportar PDF' : 'Export PDF'}
           </button>
           <button onClick={() => window.print()} className="px-6 py-4 bg-theme text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-theme/20 hover:brightness-110 transition flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
             {language === 'pt' ? 'Imprimir' : 'Print'}
           </button>
         </div>
@@ -193,7 +222,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
       <div className="no-print">
         <SummaryCards summary={summary} language={language} />
 
-        {/* PLANO DE AÇÃO COM IA NA TELA */}
+        {/* PLANO DE AÇÃO COM IA (Interface Web) */}
         <section className={`${cardBg} mt-12 p-8 md:p-12 rounded-[48px] border border-slate-200 dark:border-white/10 shadow-2xl relative overflow-hidden transition-all duration-500 hover:shadow-theme/10`}>
           <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
              <svg xmlns="http://www.w3.org/2000/svg" className="w-64 h-64 text-theme" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -272,23 +301,27 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
                {language === 'pt' ? 'Maiores Saídas' : 'Top Expenses'}
              </h2>
              <div className="space-y-6">
-               {topExpenses.map((t, idx) => (
-                 <div key={t.id} className="flex items-center justify-between group p-3 rounded-2xl hover:bg-theme/5 transition-all">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-slate-100 dark:bg-white/10 rounded-2xl flex items-center justify-center font-black text-theme border border-slate-200 dark:border-transparent">
-                        {idx + 1}
+               {topExpenses.length === 0 ? (
+                 <div className="text-center py-20 text-slate-400 font-bold italic">{language === 'pt' ? 'Nenhuma despesa para listar.' : 'No expenses to list.'}</div>
+               ) : (
+                 topExpenses.map((t, idx) => (
+                   <div key={t.id} className="flex items-center justify-between group p-3 rounded-2xl hover:bg-theme/5 transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-slate-100 dark:bg-white/10 rounded-2xl flex items-center justify-center font-black text-theme border border-slate-200 dark:border-transparent">
+                          {idx + 1}
+                        </div>
+                        <div>
+                          <p className={`font-bold ${!lightMode ? 'text-white' : 'text-slate-900'}`}>{t.description}</p>
+                          <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">{t.category}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className={`font-bold ${!lightMode ? 'text-white' : 'text-slate-900'}`}>{t.description}</p>
-                        <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">{t.category}</p>
+                      <div className="text-right">
+                        <p className="font-black text-rose-500">{formatCurrency(t.amount)}</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">{t.date}</p>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-black text-rose-500">{formatCurrency(t.amount)}</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase">{t.date}</p>
-                    </div>
-                 </div>
-               ))}
+                   </div>
+                 ))
+               )}
              </div>
           </div>
         </div>

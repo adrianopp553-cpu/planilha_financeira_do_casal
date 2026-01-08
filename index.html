@@ -79,7 +79,7 @@
         @media print {
             @page {
                 size: A4;
-                margin: 1.2cm;
+                margin: 1cm;
             }
             .no-print { display: none !important; }
             body { 
@@ -96,17 +96,11 @@
                 text-shadow: none !important;
                 filter: none !important;
             }
-            .print\:block { display: block !important; }
-            .print\:hidden { display: none !important; }
-            
-            /* High Contrast Print Overrides */
-            .print-border { border: 1px solid #000 !important; }
-            .print-text-black { color: #000 !important; }
-            .print-bg-gray { background-color: #f1f5f9 !important; }
         }
 
         .text-theme { color: var(--primary) !important; }
         .bg-theme { background-color: var(--primary) !important; }
+        .border-theme { border-color: var(--primary) !important; }
         .perspective-1000 { perspective: 1000px; }
     </style>
     <script type="importmap">

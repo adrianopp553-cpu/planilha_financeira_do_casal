@@ -87,13 +87,15 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
   return (
     <main className="pt-32 pb-48 px-6 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
       
-      {/* SEÇÃO DE IMPRESSÃO - DOCUMENTO DE ALTO CONTRASTE */}
+      {/* SEÇÃO DE IMPRESSÃO - DOCUMENTO DE ALTO CONTRASTE E COR DO TEMA */}
       <div className="hidden print:block w-full text-black bg-white font-sans">
-        <div className="flex justify-between items-end border-b-4 border-black pb-8 mb-10">
+        <div className="flex justify-between items-end border-b-4 border-theme pb-8 mb-10">
            <div className="flex items-center gap-6">
-             <FCLogo className="w-16 h-16 text-black" />
+             <div className="text-theme">
+              <FCLogo className="w-16 h-16" />
+             </div>
              <div>
-               <h1 className="text-4xl font-black uppercase tracking-tighter leading-none">Extrato Operacional</h1>
+               <h1 className="text-4xl font-black uppercase tracking-tighter leading-none text-theme">Extrato Operacional</h1>
                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-2">Relatório Consolidado de Transações • FinControl Pro</p>
              </div>
            </div>
@@ -104,7 +106,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
         </div>
         
         {summary && (
-          <div className="grid grid-cols-3 gap-0 mb-12 border-2 border-black divide-x-2 divide-black">
+          <div className="grid grid-cols-3 gap-0 mb-12 border-2 border-theme divide-x-2 divide-theme">
             <div className="p-8 text-center">
               <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-3">Total Créditos</p>
               <p className="text-2xl font-black text-emerald-600 tabular-nums">{formatCurrency(summary.totalIncome)}</p>
@@ -113,19 +115,19 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
               <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-3">Total Débitos</p>
               <p className="text-2xl font-black text-rose-600 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
             </div>
-            <div className="p-8 text-center bg-slate-50">
-              <p className="text-[9px] font-black uppercase text-slate-500 tracking-widest mb-3">Disponível</p>
-              <p className="text-2xl font-black text-black tabular-nums">{formatCurrency(summary.balance)}</p>
+            <div className="p-8 text-center bg-theme/5">
+              <p className="text-[9px] font-black uppercase text-theme opacity-60 tracking-widest mb-3">Disponível</p>
+              <p className="text-2xl font-black text-theme tabular-nums">{formatCurrency(summary.balance)}</p>
             </div>
           </div>
         )}
 
         <div className="mt-6">
-          <h2 className="text-xs font-black uppercase tracking-[0.4em] mb-6 text-black border-l-8 border-black pl-4 py-1">Histórico de Atividade</h2>
+          <h2 className="text-xs font-black uppercase tracking-[0.4em] mb-6 text-theme border-l-8 border-theme pl-4 py-1">Histórico de Atividade</h2>
           <div className="border border-slate-200 rounded-none overflow-hidden">
             <table className="w-full text-left text-[10px] border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b-2 border-black">
+                <tr className="bg-slate-50 border-b-2 border-theme">
                   <th className="py-4 px-4 font-black uppercase tracking-wider text-slate-500 w-24">Data</th>
                   <th className="py-4 px-4 font-black uppercase tracking-wider text-slate-500">Descrição do Lançamento</th>
                   <th className="py-4 px-4 font-black uppercase tracking-wider text-slate-500 text-right">Valor Líquido</th>
@@ -137,7 +139,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
                     <td className="py-4 px-4 tabular-nums text-slate-400 font-bold">{tx.date}</td>
                     <td className="py-4 px-4">
                       <span className="font-black text-black block text-xs">{tx.description}</span>
-                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{tx.category}</span>
+                      <span className="text-[8px] font-bold text-theme uppercase tracking-widest opacity-70">{tx.category}</span>
                     </td>
                     <td className={`py-4 px-4 text-right font-black tabular-nums text-xs ${tx.type === 'Entrada' ? 'text-emerald-600' : 'text-rose-600'}`}>
                       {tx.type === 'Entrada' ? '+' : '-'} {formatCurrency(tx.amount)}
@@ -149,7 +151,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
           </div>
           <div className="mt-16 pt-8 border-t border-slate-100 text-center flex flex-col items-center">
             <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.5em] mb-4">Autenticação: FinControl.Audit.2025.SECURE</p>
-            <div className="w-24 h-0.5 bg-slate-100"></div>
+            <div className="w-24 h-0.5 bg-theme/20"></div>
           </div>
         </div>
       </div>
