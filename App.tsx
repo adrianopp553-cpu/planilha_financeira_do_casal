@@ -65,7 +65,7 @@ const App: React.FC = () => {
   
   const [settings, setSettings] = useState<AppSettings>({
     language: 'pt',
-    theme: 'classic',
+    theme: 'forest', // Alterado de 'classic' para 'forest' (Verde padrão)
     lightMode: false,
     fontSize: 'medium',
     fontFamily: 'sans'
@@ -117,7 +117,7 @@ const App: React.FC = () => {
 
   if (!isLoaded) return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black gap-6">
-      <FCLogo className="w-20 h-20 text-indigo-500 animate-pulse" />
+      <FCLogo className="w-20 h-20 text-emerald-500 animate-pulse" /> {/* Alterado para Emerald/Verde */}
       <p className="text-theme font-black tracking-[0.6em] text-[10px] uppercase opacity-50">Iniciando Core Engine...</p>
     </div>
   );

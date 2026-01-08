@@ -10,7 +10,6 @@ const getBasePrompt = (transactions: Transaction[]) => `
 `;
 
 export const analyzeFinances = async (transactions: Transaction[]): Promise<AIAnalysisResult> => {
-  // Fix: Initialize GoogleGenAI strictly with process.env.API_KEY
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const model = 'gemini-3-flash-preview';
   const prompt = `${getBasePrompt(transactions)}\nForneça uma análise rápida e 3 dicas curtas para este casal.`;
@@ -32,8 +31,40 @@ export const analyzeFinances = async (transactions: Transaction[]): Promise<AIAn
   }
 };
 
+export const generateImprovementPlan = async (transactions: Transaction[]): Promise<AIAnalysisResult> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const model = 'gemini-3-pro-preview';
+  const prompt = `
+    ${getBasePrompt(transactions)}
+    
+    Como consultor financeiro estrategista, crie um "Plano de Melhoria de Resultados" para este casal.
+    O plano deve ser estruturado em HTML simples (apenas tags <b>, <br>, <ul>, <li>) e conter:
+    1. DIAGNÓSTICO: Onde eles mais estão errando.
+    2. ONDE CORTAR: Liste 3 categorias ou itens específicos para reduzir imediatamente.
+    3. ONDE INVESTIR/FOCAR: O que fazer com o saldo que sobrar.
+    4. META DO MÊS: Uma meta financeira desafiadora mas possível.
+    
+    Seja motivador e técnico.
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model,
+      contents: prompt,
+      config: {
+        systemInstruction: "Você é um mentor de liberdade financeira. Seu objetivo é fazer o casal prosperar cortando o supérfluo e focando no futuro.",
+        thinkingConfig: { thinkingBudget: 15000 },
+      },
+    });
+
+    return { text: response.text || "" };
+  } catch (error) {
+    console.error("Error in generateImprovementPlan:", error);
+    return { text: "Não foi possível gerar o plano de estratégia no momento." };
+  }
+};
+
 export const deepThinkingAnalysis = async (transactions: Transaction[]): Promise<AIAnalysisResult> => {
-  // Fix: Initialize GoogleGenAI strictly with process.env.API_KEY
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const model = 'gemini-3-pro-preview';
   const prompt = `
@@ -62,7 +93,6 @@ export const deepThinkingAnalysis = async (transactions: Transaction[]): Promise
 };
 
 export const marketSearchAnalysis = async (transactions: Transaction[]): Promise<AIAnalysisResult> => {
-  // Fix: Initialize GoogleGenAI strictly with process.env.API_KEY
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const model = 'gemini-3-flash-preview';
   const prompt = `

@@ -1,6 +1,7 @@
 
-import React, { lazy, Suspense } from 'react';
-import { Transaction, FinancialSummary, TransactionType } from '../types';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
+import { Transaction, FinancialSummary, TransactionType, AIAnalysisResult } from '../types';
+import { generateImprovementPlan } from '../services/geminiService';
 import SummaryCards from './SummaryCards';
 
 const FinancialCharts = lazy(() => import('./FinancialCharts'));
@@ -14,9 +15,12 @@ interface ResultsViewProps {
 }
 
 const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack, language, lightMode }) => {
+  const [aiPlan, setAiPlan] = useState<AIAnalysisResult | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState(false);
+
   const themeOrWhite = !lightMode ? 'text-white' : 'text-theme';
   const textContrast = !lightMode ? 'text-slate-300' : 'text-slate-600';
-  const labelSecondary = !lightMode ? 'text-slate-500' : 'text-slate-400';
+  const cardBg = !lightMode ? 'bg-white/5' : 'bg-white/95';
 
   const formatCurrency = (val: number) => 
     new Intl.NumberFormat(language === 'pt' ? 'pt-BR' : 'en-US', { 
@@ -28,6 +32,20 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
     .filter(t => t.type === TransactionType.EXPENSE)
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 5);
+
+  const fetchAIPlan = async () => {
+    if (transactions.length === 0) return;
+    setLoadingPlan(true);
+    const plan = await generateImprovementPlan(transactions);
+    setAiPlan(plan);
+    setLoadingPlan(false);
+  };
+
+  useEffect(() => {
+    if (transactions.length > 0 && !aiPlan) {
+      fetchAIPlan();
+    }
+  }, [transactions]);
 
   const handleExportPDF = () => {
     const oldTitle = document.title;
@@ -68,8 +86,77 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
 
       <SummaryCards summary={summary} language={language} />
 
+      {/* NOVO MÓDULO: PLANO DE AÇÃO COM IA */}
+      <section className={`${cardBg} mt-12 p-8 md:p-12 rounded-[48px] border border-slate-200 dark:border-white/10 shadow-2xl relative overflow-hidden transition-all duration-500 hover:shadow-theme/10 page-break-inside-avoid`}>
+        <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none no-print">
+           <svg xmlns="http://www.w3.org/2000/svg" className="w-64 h-64 text-theme" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+           </svg>
+        </div>
+
+        <div className="relative z-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+            <div className="flex items-center gap-5">
+              <div className="w-14 h-14 bg-theme rounded-2xl flex items-center justify-center text-white shadow-lg shadow-theme/30 ring-4 ring-theme/10">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className={`text-3xl font-black tracking-tight ${themeOrWhite}`}>
+                  {language === 'pt' ? 'Plano de Evolução Financeira' : 'Financial Evolution Plan'}
+                </h2>
+                <p className={`text-[10px] font-black uppercase tracking-[0.4em] ${textContrast} mt-1`}>
+                  Powered by Gemini 3.0 Pro AI
+                </p>
+              </div>
+            </div>
+            <button 
+              onClick={fetchAIPlan}
+              disabled={loadingPlan}
+              className="no-print px-8 py-4 bg-theme/10 hover:bg-theme/20 border border-theme/20 rounded-2xl text-[11px] font-black text-theme uppercase tracking-widest transition-all disabled:opacity-50"
+            >
+              {loadingPlan ? 'Gerando Plano...' : 'Recalcular Estratégia'}
+            </button>
+          </div>
+
+          {loadingPlan ? (
+            <div className="space-y-6 animate-pulse">
+              <div className="h-8 bg-theme/5 rounded-full w-1/3"></div>
+              <div className="h-4 bg-slate-200 dark:bg-white/5 rounded-full w-full"></div>
+              <div className="h-4 bg-slate-200 dark:bg-white/5 rounded-full w-5/6"></div>
+              <div className="h-4 bg-slate-200 dark:bg-white/5 rounded-full w-4/6"></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                <div className="h-40 bg-slate-100 dark:bg-white/5 rounded-[32px]"></div>
+                <div className="h-40 bg-slate-100 dark:bg-white/5 rounded-[32px]"></div>
+              </div>
+            </div>
+          ) : aiPlan ? (
+            <div className={`prose prose-invert max-w-none text-lg transition-all duration-700 ${!lightMode ? 'text-slate-300' : 'text-slate-700'}`}>
+               <div 
+                 className="plan-content"
+                 dangerouslySetInnerHTML={{ __html: aiPlan.text }} 
+               />
+               <style>{`
+                 .plan-content b { color: var(--primary); font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; font-size: 1.1em; display: block; margin-top: 1.5rem; }
+                 .plan-content ul { list-style: none; padding-left: 0; margin-top: 1rem; display: grid; grid-template-cols: 1fr; gap: 0.5rem; }
+                 @media (min-width: 768px) { .plan-content ul { grid-template-cols: 1fr 1fr; } }
+                 .plan-content li { background: rgba(var(--primary-rgb), 0.05); padding: 1rem 1.5rem; border-radius: 1.5rem; border-left: 4px solid var(--primary); font-size: 0.9em; font-weight: 600; }
+                 .dark-mode .plan-content li { background: rgba(255,255,255, 0.03); }
+               `}</style>
+            </div>
+          ) : (
+            <div className="py-20 text-center">
+              <p className="text-slate-400 font-black italic uppercase tracking-widest">
+                Adicione transações para receber seu plano estratégico personalizado.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12">
-        <div className="bg-white/95 dark:bg-white/5 p-10 rounded-[40px] shadow-sm border border-slate-200 dark:border-white/10 page-break-inside-avoid">
+        <div className={`${cardBg} p-10 rounded-[40px] shadow-sm border border-slate-200 dark:border-white/10 page-break-inside-avoid`}>
           <div className="flex items-center justify-between mb-8">
             <h2 className={`text-2xl font-black transition-colors duration-300 ${themeOrWhite}`}>
               {language === 'pt' ? 'Distribuição de Gastos' : 'Expense Distribution'}
@@ -86,7 +173,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
           </Suspense>
         </div>
 
-        <div className="bg-white/95 dark:bg-white/5 p-10 rounded-[40px] shadow-sm border border-slate-200 dark:border-white/10 page-break-inside-avoid">
+        <div className={`${cardBg} p-10 rounded-[40px] shadow-sm border border-slate-200 dark:border-white/10 page-break-inside-avoid`}>
            <h2 className={`text-2xl font-black mb-8 transition-colors duration-300 ${themeOrWhite}`}>
              {language === 'pt' ? 'Top 5 Maiores Gastos' : 'Top 5 Expenses'}
            </h2>
@@ -103,7 +190,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
                         {idx + 1}
                       </div>
                       <div>
-                        <p className="font-bold text-slate-900 dark:text-white">{t.description}</p>
+                        <p className={`font-bold ${!lightMode ? 'text-white' : 'text-slate-900'}`}>{t.description}</p>
                         <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">{t.category}</p>
                       </div>
                     </div>
@@ -118,17 +205,17 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
         </div>
       </div>
 
-      <div className="mt-10 bg-white/95 dark:bg-white/5 p-12 rounded-[48px] shadow-sm border border-slate-200 dark:border-white/10 page-break-inside-avoid transition-all duration-300">
+      <div className={`mt-10 ${cardBg} p-12 rounded-[48px] shadow-sm border border-slate-200 dark:border-white/10 page-break-inside-avoid transition-all duration-300`}>
         <h2 className={`text-3xl font-black mb-10 tracking-tight ${themeOrWhite}`}>{language === 'pt' ? 'Consolidado Geral' : 'Overall Consolidation'}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
            <div className="bg-slate-50 dark:bg-white/5 p-8 rounded-[32px] border border-slate-100 dark:border-white/10">
-              <p className={`font-black uppercase text-[10px] tracking-[0.25em] mb-4 ${labelSecondary}`}>
+              <p className={`font-black uppercase text-[10px] tracking-[0.25em] mb-4 text-slate-400`}>
                 {language === 'pt' ? 'Total Entradas' : 'Total Income'}
               </p>
               <p className="text-4xl font-black text-emerald-600 tabular-nums">{formatCurrency(summary.totalIncome)}</p>
            </div>
            <div className="bg-slate-50 dark:bg-white/5 p-8 rounded-[32px] border border-slate-100 dark:border-white/10">
-              <p className={`font-black uppercase text-[10px] tracking-[0.25em] mb-4 ${labelSecondary}`}>
+              <p className={`font-black uppercase text-[10px] tracking-[0.25em] mb-4 text-slate-400`}>
                 {language === 'pt' ? 'Total Saídas' : 'Total Expenses'}
               </p>
               <p className="text-4xl font-black text-rose-600 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
