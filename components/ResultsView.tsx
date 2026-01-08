@@ -67,46 +67,47 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
   return (
     <main className="pt-32 pb-40 px-6 max-w-7xl mx-auto animate-in fade-in duration-500">
       
-      {/* SEÇÃO DE IMPRESSÃO - DOCUMENTO DE ALTO NÍVEL (CONSULTORIA) */}
-      <div className="hidden print:block w-full text-black bg-white font-sans">
-        {/* Cabeçalho Executivo */}
-        <div className="flex justify-between items-start border-b-[8px] border-theme pb-10 mb-12">
-          <div className="flex items-center gap-8">
+      {/* SEÇÃO DE IMPRESSÃO - ALTO CONTRASTE E LEGIBILIDADE MÁXIMA */}
+      <div className="hidden print:block w-full text-slate-900 bg-white font-sans leading-tight">
+        {/* Cabeçalho Executivo de Alto Impacto */}
+        <div className="flex justify-between items-start border-b-[10px] border-theme pb-12 mb-12">
+          <div className="flex items-center gap-10">
             <div className="text-theme">
               <FCLogo className="w-24 h-24" />
             </div>
             <div>
-              <h1 className="text-5xl font-black text-theme tracking-tighter leading-none uppercase">Relatório de Saúde Financeira</h1>
-              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.5em] mt-3">Análise Prospectiva & Inteligência de Dados • Pro Edition</p>
+              <h1 className="text-6xl font-black text-theme tracking-tighter leading-none uppercase">Relatório de Gestão</h1>
+              <p className="text-[12px] font-black text-slate-900 uppercase tracking-[0.5em] mt-4 opacity-70">Auditoria Digital de Fluxo • FinControl Pro v2.5</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <div className="bg-theme text-white px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg mb-4">Certificação de Integridade</div>
-            <p className="text-3xl font-black tabular-nums leading-none">{new Date().toLocaleDateString()}</p>
+            <div className="bg-slate-900 text-white px-6 py-2 text-[11px] font-black uppercase tracking-widest rounded-lg mb-4">Documento Original</div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Referência de Emissão</p>
+            <p className="text-3xl font-black tabular-nums leading-none text-slate-900">{new Date().toLocaleDateString()}</p>
           </div>
         </div>
 
-        {/* Dash de Resumo (Cards) */}
-        <div className="grid grid-cols-3 gap-6 mb-12">
-          <div className="p-8 rounded-[32px] border-2 border-theme/20 bg-theme/5">
-            <p className="text-[9px] font-black uppercase tracking-widest text-theme opacity-60 mb-2">Fluxo de Entrada</p>
-            <p className="text-3xl font-black text-emerald-600 tabular-nums">{formatCurrency(summary.totalIncome)}</p>
+        {/* Dash de Resumo com Tipografia Reforçada */}
+        <div className="grid grid-cols-3 gap-0 mb-16 border-[3px] border-slate-900 overflow-hidden rounded-[40px]">
+          <div className="p-10 border-r-[3px] border-slate-900 bg-slate-900 text-white">
+            <p className="text-[11px] font-black uppercase tracking-widest opacity-60 mb-3">Total Receitas</p>
+            <p className="text-4xl font-black text-emerald-400 tabular-nums leading-none">{formatCurrency(summary.totalIncome)}</p>
           </div>
-          <div className="p-8 rounded-[32px] border-2 border-rose-100 bg-rose-50/30">
-            <p className="text-[9px] font-black uppercase tracking-widest text-rose-500 mb-2">Fluxo de Saída</p>
-            <p className="text-3xl font-black text-rose-500 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
+          <div className="p-10 border-r-[3px] border-slate-900 bg-slate-900 text-white">
+            <p className="text-[11px] font-black uppercase tracking-widest opacity-60 mb-3">Total Despesas</p>
+            <p className="text-4xl font-black text-rose-500 tabular-nums leading-none">{formatCurrency(summary.totalExpense)}</p>
           </div>
-          <div className="p-8 rounded-[32px] border-2 border-theme bg-theme text-white shadow-xl">
-            <p className="text-[9px] font-black uppercase tracking-widest opacity-80 mb-2">Resultado Líquido</p>
-            <p className="text-3xl font-black tabular-nums">{formatCurrency(summary.balance)}</p>
+          <div className="p-10 bg-slate-50 text-slate-900">
+            <p className="text-[11px] font-black uppercase tracking-widest opacity-50 mb-3 text-slate-500">Saldo Final</p>
+            <p className="text-4xl font-black tabular-nums leading-none">{formatCurrency(summary.balance)}</p>
           </div>
         </div>
 
-        {/* Infográficos Nativos no PDF */}
-        <div className="grid grid-cols-2 gap-10 mb-16">
-          <div className="bg-slate-50 p-10 rounded-[40px] border border-slate-100">
-            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-theme mb-8 flex items-center gap-3">
-              <span className="w-2 h-2 bg-theme rounded-full"></span> Composição de Despesas
+        {/* Infográficos Nativos no PDF (Legibilidade Reforçada) */}
+        <div className="grid grid-cols-2 gap-12 mb-20">
+          <div className="bg-white p-10 rounded-[40px] border-[3px] border-slate-100">
+            <h2 className="text-sm font-black uppercase tracking-[0.4em] text-slate-900 mb-10 flex items-center gap-4">
+              <span className="w-3 h-3 bg-theme rounded-full"></span> Composição de Gastos
             </h2>
             <div className="h-64">
               <Suspense fallback={null}>
@@ -115,80 +116,109 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
             </div>
           </div>
 
-          <div className="bg-slate-50 p-10 rounded-[40px] border border-slate-100">
-            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-theme mb-8 flex items-center gap-3">
-              <span className="w-2 h-2 bg-theme rounded-full"></span> Maiores Ofensores (Top 5)
+          <div className="bg-white p-10 rounded-[40px] border-[3px] border-slate-100">
+            <h2 className="text-sm font-black uppercase tracking-[0.4em] text-slate-900 mb-10 flex items-center gap-4">
+              <span className="w-3 h-3 bg-theme rounded-full"></span> Maiores Saídas
             </h2>
             <div className="space-y-4">
               {topExpenses.map((t, idx) => (
-                <div key={t.id} className="flex items-center justify-between p-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                  <div className="flex items-center gap-4">
-                    <span className="text-theme font-black text-sm">#0{idx+1}</span>
+                <div key={t.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="flex items-center gap-5">
+                    <span className="text-theme font-black text-lg">#0{idx+1}</span>
                     <div>
-                      <p className="text-xs font-black text-slate-800">{t.description}</p>
-                      <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{t.category}</p>
+                      <p className="text-sm font-black text-slate-900 uppercase">{t.description}</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.category}</p>
                     </div>
                   </div>
-                  <p className="text-xs font-black text-rose-500">{formatCurrency(t.amount)}</p>
+                  <p className="text-sm font-black text-rose-600">{formatCurrency(t.amount)}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Insights da Consultoria Gemini AI (Layout Visual) */}
-        <div className="mb-16">
-          <h2 className="text-xs font-black uppercase tracking-[0.5em] text-theme mb-10 flex items-center gap-4">
-            <span className="flex-1 h-[2px] bg-theme/20"></span> ESTRATÉGIA RECOMENDADA <span className="flex-1 h-[2px] bg-theme/20"></span>
+        {/* Análise Estratégica Gemini AI - Tipografia de Alta Precisão */}
+        <div className="mb-20">
+          <h2 className="text-sm font-black uppercase tracking-[0.6em] text-slate-900 mb-12 flex items-center gap-5">
+             ANÁLISE ESTRATÉGICA GEMINI AI <span className="flex-1 h-[3px] bg-slate-100"></span>
           </h2>
-          <div className="grid grid-cols-1 gap-8">
+          <div className="grid grid-cols-1 gap-10">
             {aiPlan ? (
               <div 
-                className="text-lg font-bold leading-relaxed text-slate-700 p-12 bg-theme/5 border-2 border-theme/10 rounded-[48px] relative overflow-hidden"
+                className="text-xl font-bold leading-relaxed text-slate-800 p-14 bg-slate-50 rounded-[48px] border-2 border-slate-200"
                 dangerouslySetInnerHTML={{ 
                   __html: aiPlan.text
-                    .replace(/<b>/g, '<b class="text-theme" style="font-weight:900; text-transform:uppercase; display:block; margin-top:2.5rem; margin-bottom:1rem; font-size:16px; letter-spacing:2px; border-bottom: 2px solid currentColor; width: fit-content; padding-bottom: 4px">')
-                    .replace(/<li>/g, '<li style="margin-bottom: 1rem; list-style-type: none; background: white; padding: 1.25rem; border-radius: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05)">')
+                    .replace(/<b>/g, '<b style="color:var(--primary); font-weight:900; text-transform:uppercase; display:block; margin-top:3rem; margin-bottom:1.5rem; font-size:18px; letter-spacing:2px; border-bottom: 3px solid var(--primary); width: fit-content; padding-bottom: 6px">')
+                    .replace(/<li>/g, '<li style="margin-bottom: 1.5rem; list-style-type: none; background: white; padding: 1.5rem 2rem; border-radius: 2rem; border: 2px solid #f1f5f9; font-size: 16px">')
                 }} 
               />
             ) : (
-              <div className="py-20 text-center border-4 border-dashed border-slate-100 rounded-[48px] text-slate-300 font-black uppercase tracking-widest">
-                Gerando recomendações estratégicas...
+              <div className="py-24 text-center border-[4px] border-dashed border-slate-100 rounded-[48px] text-slate-300 font-black uppercase tracking-widest">
+                Análise de IA não disponível para este ciclo.
               </div>
             )}
           </div>
         </div>
 
-        {/* Dica de Ouro / Conclusão Estratégica */}
-        <div className="mt-20 p-12 bg-slate-900 rounded-[48px] text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-10 opacity-10">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-40 h-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        {/* Extrato Detalhado de Movimentação */}
+        <div className="mb-20 page-break-before-auto">
+          <h2 className="text-sm font-black uppercase tracking-[0.6em] text-slate-900 mb-10 flex items-center gap-5">
+             EXTRATO DE MOVIMENTAÇÃO <span className="flex-1 h-[3px] bg-slate-100"></span>
+          </h2>
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-slate-900 text-white rounded-t-2xl">
+                <th className="py-6 px-6 text-[11px] font-black uppercase tracking-widest">Data</th>
+                <th className="py-6 px-6 text-[11px] font-black uppercase tracking-widest">Descrição Técnica</th>
+                <th className="py-6 px-6 text-[11px] font-black uppercase tracking-widest">Categoria</th>
+                <th className="py-6 px-6 text-right text-[11px] font-black uppercase tracking-widest">Valor Operacional</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 border-x border-b border-slate-100">
+              {transactions.map(tx => (
+                <tr key={tx.id} className="page-break-inside-avoid">
+                  <td className="py-6 px-6 text-[12px] font-black text-slate-900 tabular-nums">{tx.date}</td>
+                  <td className="py-6 px-6 text-[12px] font-black text-slate-900 uppercase">{tx.description}</td>
+                  <td className="py-6 px-6 text-[10px] font-black text-theme uppercase tracking-widest">{tx.category}</td>
+                  <td className={`py-6 px-6 text-right text-[12px] font-black tabular-nums ${tx.type === 'Entrada' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    {tx.type === 'Entrada' ? '+' : '-'} {formatCurrency(tx.amount)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Dica de Ouro de Encerramento (Destaque Final) */}
+        <div className="mt-32 p-16 bg-theme rounded-[56px] text-white relative overflow-hidden shadow-2xl">
+          <div className="absolute -right-10 -bottom-10 opacity-10">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-64 h-64" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <h3 className="text-theme font-black uppercase tracking-[0.5em] text-[10px] mb-6">Dica de Ouro de Encerramento</h3>
-          <p className="text-2xl font-black leading-tight italic max-w-2xl">
+          <h3 className="text-white font-black uppercase tracking-[0.6em] text-[12px] mb-8 opacity-80">Conclusão Estratégica do Mentor</h3>
+          <p className="text-3xl font-black leading-snug italic max-w-4xl text-white">
             {summary.balance >= 0 
-              ? "O lucro não é o que resta, é o que você prioriza primeiro. Considere automatizar 15% deste saldo para investimentos de longo prazo hoje mesmo."
-              : "Crises são oportunidades de simplificação. Foque nos 'Ofensores' listados acima; reduzir apenas a maior categoria em 20% mudará seu saldo para o azul no próximo ciclo."}
+              ? "Parabéns pela disciplina. O excedente de hoje é a sua liberdade de amanhã. Direcione 20% do saldo para sua reserva de oportunidade agora."
+              : "Este ciclo exigiu resiliência. O foco deve ser o controle de 'Maiores Saídas'. Reduzir apenas a principal categoria em 15% reverterá o fluxo no próximo mês."}
           </p>
         </div>
 
-        {/* Footer de Autenticidade */}
-        <div className="mt-24 pt-10 border-t-2 border-slate-100 flex justify-between items-center opacity-60">
-           <div className="flex gap-12">
+        {/* Rodapé de Conformidade */}
+        <div className="mt-32 pt-12 border-t-[4px] border-slate-100 flex justify-between items-center opacity-70">
+           <div className="flex gap-16">
              <div>
-               <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Hash de Auditoria</p>
-               <p className="text-[10px] font-mono text-slate-900 font-bold">FCP-{Math.random().toString(36).substr(2, 6).toUpperCase()}-INF</p>
+               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Código de Verificação</p>
+               <p className="text-[13px] font-mono text-slate-900 font-black">FC-{Math.random().toString(36).substr(2, 8).toUpperCase()}</p>
              </div>
              <div>
-               <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Status do Ciclo</p>
-               <p className="text-[10px] font-black text-theme uppercase">Finalizado & Analisado</p>
+               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Certificação</p>
+               <p className="text-[11px] font-black text-theme uppercase tracking-widest">Auditado & Validado</p>
              </div>
            </div>
            <div className="text-right">
-             <p className="text-[9px] font-black text-theme uppercase tracking-[0.2em]">FinControl Pro Enterprise Edition</p>
-             <p className="text-[8px] font-bold text-slate-400 mt-1 uppercase">Powered by Gemini Strategic AI Engine</p>
+             <p className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em]">FinControl Pro Enterprise Division</p>
+             <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">Strategic Analysis Infrastructure 2025</p>
            </div>
         </div>
       </div>
@@ -213,7 +243,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
             {language === 'pt' ? 'Exportar PDF' : 'Export PDF'}
           </button>
           <button onClick={() => window.print()} className="px-6 py-4 bg-theme text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-theme/20 hover:brightness-110 transition flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
             {language === 'pt' ? 'Imprimir' : 'Print'}
           </button>
         </div>
