@@ -108,27 +108,31 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
           {/* Gráfico de Distribuição */}
           <div className="col-span-7 bg-slate-50 p-10 rounded-[40px] border border-slate-200 page-break-inside-avoid">
             <h2 className="text-sm font-black uppercase tracking-[0.4em] text-slate-900 mb-8 border-l-4 border-theme pl-4">Distribuição por Categoria</h2>
-            <div className="h-[280px]">
+            <div className="min-h-[320px]">
               <Suspense fallback={null}>
                 <FinancialCharts transactions={transactions} language={language} />
               </Suspense>
             </div>
           </div>
 
-          {/* Maiores Gastos - Lista Técnica */}
-          <div className="col-span-5 bg-white p-10 rounded-[40px] border border-slate-200 page-break-inside-avoid">
-            <h2 className="text-sm font-black uppercase tracking-[0.4em] text-slate-900 mb-8 border-l-4 border-theme pl-4">Maiores Ofensores</h2>
+          {/* Maiores Gastos - Design Especial de Cartões */}
+          <div className="col-span-5 bg-slate-900 p-10 rounded-[40px] border border-slate-800 page-break-inside-avoid shadow-2xl">
+            <h2 className="text-sm font-black uppercase tracking-[0.4em] text-white mb-10 border-l-4 border-theme pl-4">Maiores Ofensores</h2>
             <div className="space-y-4">
               {topExpenses.map((t, idx) => (
-                <div key={t.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                  <div className="flex items-center gap-4">
-                    <span className="w-8 h-8 flex items-center justify-center bg-theme text-white rounded-lg font-black text-xs">0{idx+1}</span>
+                <div key={t.id} className="flex items-center justify-between p-5 bg-white rounded-[24px] border border-white/10 shadow-xl transition-all">
+                  <div className="flex items-center gap-5">
+                    <span className="w-10 h-10 flex items-center justify-center bg-theme text-white rounded-xl font-black text-sm shadow-lg shadow-theme/30">
+                      0{idx+1}
+                    </span>
                     <div>
-                      <p className="text-xs font-black text-slate-800 uppercase">{t.description}</p>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.category}</p>
+                      <p className="text-xs font-black text-slate-900 uppercase tracking-tight">{t.description}</p>
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{t.category}</p>
                     </div>
                   </div>
-                  <p className="text-sm font-black text-rose-600 tabular-nums">-{formatCurrency(t.amount)}</p>
+                  <p className="text-sm font-black text-rose-600 tabular-nums">
+                    {formatCurrency(t.amount)}
+                  </p>
                 </div>
               ))}
             </div>
@@ -282,6 +286,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
         </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12">
+          {/* Distribuição de Gastos com Legend no Topo */}
           <div className={`${cardBg} p-10 rounded-[40px] shadow-sm border border-slate-200 dark:border-white/10`}>
             <div className="flex items-center justify-between mb-8">
               <h2 className={`text-2xl font-black transition-colors duration-300 ${themeOrWhite}`}>
@@ -293,28 +298,29 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
             </Suspense>
           </div>
 
+          {/* Maiores Saídas com Novo Design de Cartões */}
           <div className={`${cardBg} p-10 rounded-[40px] shadow-sm border border-slate-200 dark:border-white/10`}>
              <h2 className={`text-2xl font-black mb-8 transition-colors duration-300 ${themeOrWhite}`}>
                {language === 'pt' ? 'Maiores Saídas' : 'Top Expenses'}
              </h2>
-             <div className="space-y-6">
+             <div className="space-y-4">
                {topExpenses.length === 0 ? (
                  <div className="text-center py-20 text-slate-400 font-bold italic">{language === 'pt' ? 'Nenhuma despesa para listar.' : 'No expenses to list.'}</div>
                ) : (
                  topExpenses.map((t, idx) => (
-                   <div key={t.id} className="flex items-center justify-between group p-3 rounded-2xl hover:bg-theme/5 transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-slate-100 dark:bg-white/10 rounded-2xl flex items-center justify-center font-black text-theme border border-slate-200 dark:border-transparent">
-                          {idx + 1}
+                   <div key={t.id} className="flex items-center justify-between group p-4 bg-gray-50/50 dark:bg-white/5 rounded-[28px] border border-transparent hover:border-theme/30 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                      <div className="flex items-center gap-5">
+                        <div className="w-12 h-12 bg-theme rounded-2xl flex items-center justify-center font-black text-white shadow-lg shadow-theme/20 transition-transform group-hover:rotate-6">
+                          0{idx + 1}
                         </div>
                         <div>
-                          <p className={`font-bold ${!lightMode ? 'text-white' : 'text-slate-900'}`}>{t.description}</p>
-                          <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">{t.category}</p>
+                          <p className={`font-black text-sm tracking-tight uppercase ${!lightMode ? 'text-white' : 'text-slate-900'}`}>{t.description}</p>
+                          <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{t.category}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-black text-rose-500">{formatCurrency(t.amount)}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase">{t.date}</p>
+                        <p className="font-black text-lg text-rose-500 tabular-nums">{formatCurrency(t.amount)}</p>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{t.date}</p>
                       </div>
                    </div>
                  ))
