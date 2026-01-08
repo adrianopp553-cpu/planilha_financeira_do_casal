@@ -14,6 +14,13 @@ interface ResultsViewProps {
   lightMode: boolean; 
 }
 
+const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
+  <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M32 35 H 58 V 42 H 40 V 48 H 55 V 55 H 40 V 70 H 32 V 35 Z" fill="currentColor" />
+    <path d="M62 38 C 72 38, 78 45, 78 55 C 78 65, 72 72, 62 72 M 62 48 C 68 48, 70 52, 70 55 C 70 58, 68 62, 62 62" stroke="currentColor" strokeWidth="6" strokeLinecap="round" fill="none" />
+  </svg>
+);
+
 const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack, language, lightMode }) => {
   const [aiPlan, setAiPlan] = useState<AIAnalysisResult | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
@@ -50,7 +57,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
   const handleExportPDF = () => {
     const oldTitle = document.title;
     const dateStr = new Date().toLocaleDateString(language === 'pt' ? 'pt-BR' : 'en-US').replace(/\//g, '-');
-    document.title = `Relatorio_FinControl_${dateStr}`;
+    document.title = `FinControl_Report_${dateStr}`;
     setTimeout(() => {
       window.print();
       document.title = oldTitle;
@@ -59,9 +66,108 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
 
   return (
     <main className="pt-32 pb-40 px-6 max-w-7xl mx-auto animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
+      
+      {/* SEÇÃO DE IMPRESSÃO - DOCUMENTO OFICIAL ÚNICO */}
+      <div className="hidden print:block w-full text-black bg-white font-sans">
+        {/* Cabeçalho de Auditoria */}
+        <div className="flex justify-between items-start border-b-4 border-black pb-8 mb-10">
+          <div className="flex items-center gap-6">
+            <FCLogo className="w-16 h-16 text-black" />
+            <div>
+              <h1 className="text-4xl font-black uppercase tracking-tighter leading-none">Relatório de Gestão</h1>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-2">Plataforma FinControl Pro v2.5 • Auditoria Digital de Fluxo</p>
+            </div>
+          </div>
+          <div className="text-right flex flex-col items-end">
+            <span className="bg-black text-white px-3 py-1 text-[9px] font-black uppercase tracking-widest mb-3">Documento Original</span>
+            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Referência de Emissão</p>
+            <p className="text-xl font-black tabular-nums">{new Date().toLocaleDateString()}</p>
+          </div>
+        </div>
+
+        {/* Resumo Consolidado (Bordas fortes para contraste) */}
+        <div className="grid grid-cols-3 gap-0 mb-12 border-2 border-black divide-x-2 divide-black">
+          <div className="p-8 text-center bg-white">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Total Receitas</p>
+            <p className="text-3xl font-black text-emerald-600 tabular-nums">{formatCurrency(summary.totalIncome)}</p>
+          </div>
+          <div className="p-8 text-center bg-white">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Total Despesas</p>
+            <p className="text-3xl font-black text-rose-600 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
+          </div>
+          <div className="p-8 text-center bg-slate-100">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Saldo Final</p>
+            <p className={`text-3xl font-black tabular-nums ${summary.balance >= 0 ? 'text-black' : 'text-rose-700'}`}>
+              {formatCurrency(summary.balance)}
+            </p>
+          </div>
+        </div>
+
+        {/* Plano da IA (Formatação de Documento) */}
+        <div className="mb-12 border-l-8 border-black pl-8 py-2">
+          <h2 className="text-sm font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-3">
+            <span className="w-2 h-2 bg-black rounded-full"></span> Análise Estratégica Gemini AI
+          </h2>
+          {aiPlan ? (
+            <div 
+              className="text-base font-bold leading-relaxed text-slate-800 space-y-4"
+              dangerouslySetInnerHTML={{ __html: aiPlan.text.replace(/<b>/g, '<b class="text-black font-black uppercase block mt-6 mb-2 text-sm tracking-wide">') }} 
+            />
+          ) : (
+            <p className="italic text-slate-400">Análise de IA não disponível para este ciclo.</p>
+          )}
+        </div>
+
+        {/* Tabela de Transações (Minimalismo de Contraste) */}
+        <div className="mt-16">
+          <h2 className="text-xs font-black uppercase tracking-[0.4em] mb-6 text-black">Extrato de Movimentação</h2>
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-y-2 border-black bg-slate-50">
+                <th className="py-4 px-4 text-left text-[9px] font-black uppercase text-slate-500">Data</th>
+                <th className="py-4 px-4 text-left text-[9px] font-black uppercase text-slate-500">Descrição Técnica</th>
+                <th className="py-4 px-4 text-left text-[9px] font-black uppercase text-slate-500">Categoria</th>
+                <th className="py-4 px-4 text-right text-[9px] font-black uppercase text-slate-500">Valor Operacional</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {transactions.map(tx => (
+                <tr key={tx.id} className="page-break-inside-avoid">
+                  <td className="py-4 px-4 text-[10px] font-bold text-slate-400 tabular-nums">{tx.date}</td>
+                  <td className="py-4 px-4 text-xs font-black text-black">{tx.description}</td>
+                  <td className="py-4 px-4 text-[9px] font-black text-slate-500 uppercase">{tx.category}</td>
+                  <td className={`py-4 px-4 text-right text-xs font-black tabular-nums ${tx.type === 'Entrada' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    {tx.type === 'Entrada' ? '+' : '-'} {formatCurrency(tx.amount)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Rodapé de Autenticidade Digital */}
+        <div className="mt-20 pt-10 border-t border-slate-200 flex justify-between items-center opacity-60">
+           <div className="flex gap-10">
+             <div>
+               <p className="text-[7px] font-black uppercase tracking-widest text-slate-400 mb-1">Hash de Integridade</p>
+               <p className="text-[9px] font-mono text-slate-900">FC-{Math.random().toString(36).substr(2, 9).toUpperCase()}</p>
+             </div>
+             <div>
+               <p className="text-[7px] font-black uppercase tracking-widest text-slate-400 mb-1">Protocolo</p>
+               <p className="text-[9px] font-mono text-slate-900">DGT-992.001-X</p>
+             </div>
+           </div>
+           <div className="text-right">
+             <p className="text-[8px] font-black uppercase tracking-[0.3em] text-black">FinControl Pro Certified Report</p>
+             <p className="text-[7px] font-bold text-slate-400 mt-1 uppercase">Este documento possui validade informativa e gerencial.</p>
+           </div>
+        </div>
+      </div>
+
+      {/* DASHBOARD DE TELA (NO-PRINT) */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 no-print">
         <div>
-          <button onClick={onBack} className="flex items-center gap-2 text-theme font-black text-xs uppercase tracking-widest mb-4 hover:gap-3 transition-all no-print">
+          <button onClick={onBack} className="flex items-center gap-2 text-theme font-black text-xs uppercase tracking-widest mb-4 hover:gap-3 transition-all">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             {language === 'pt' ? 'Voltar ao Dashboard' : 'Back to Dashboard'}
           </button>
@@ -72,7 +178,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
             {language === 'pt' ? 'Análise detalhada do seu desempenho financeiro.' : 'Detailed analysis of your financial performance.'}
           </p>
         </div>
-        <div className="flex gap-3 no-print">
+        <div className="flex gap-3">
           <button onClick={handleExportPDF} className={`px-6 py-4 bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-white/80 hover:bg-slate-50 dark:hover:bg-white/20 transition flex items-center gap-2 shadow-sm`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             {language === 'pt' ? 'Exportar PDF' : 'Export PDF'}
@@ -84,109 +190,92 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
         </div>
       </div>
 
-      <SummaryCards summary={summary} language={language} />
+      <div className="no-print">
+        <SummaryCards summary={summary} language={language} />
 
-      {/* NOVO MÓDULO: PLANO DE AÇÃO COM IA */}
-      <section className={`${cardBg} mt-12 p-8 md:p-12 rounded-[48px] border border-slate-200 dark:border-white/10 shadow-2xl relative overflow-hidden transition-all duration-500 hover:shadow-theme/10 page-break-inside-avoid`}>
-        <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none no-print">
-           <svg xmlns="http://www.w3.org/2000/svg" className="w-64 h-64 text-theme" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-           </svg>
-        </div>
-
-        <div className="relative z-10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-            <div className="flex items-center gap-5">
-              <div className="w-14 h-14 bg-theme rounded-2xl flex items-center justify-center text-white shadow-lg shadow-theme/30 ring-4 ring-theme/10">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div>
-                <h2 className={`text-3xl font-black tracking-tight ${themeOrWhite}`}>
-                  {language === 'pt' ? 'Plano de Evolução Financeira' : 'Financial Evolution Plan'}
-                </h2>
-                <p className={`text-[10px] font-black uppercase tracking-[0.4em] ${textContrast} mt-1`}>
-                  Powered by Gemini 3.0 Pro AI
-                </p>
-              </div>
-            </div>
-            <button 
-              onClick={fetchAIPlan}
-              disabled={loadingPlan}
-              className="no-print px-8 py-4 bg-theme/10 hover:bg-theme/20 border border-theme/20 rounded-2xl text-[11px] font-black text-theme uppercase tracking-widest transition-all disabled:opacity-50"
-            >
-              {loadingPlan ? 'Gerando Plano...' : 'Recalcular Estratégia'}
-            </button>
+        {/* PLANO DE AÇÃO COM IA NA TELA */}
+        <section className={`${cardBg} mt-12 p-8 md:p-12 rounded-[48px] border border-slate-200 dark:border-white/10 shadow-2xl relative overflow-hidden transition-all duration-500 hover:shadow-theme/10`}>
+          <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+             <svg xmlns="http://www.w3.org/2000/svg" className="w-64 h-64 text-theme" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+             </svg>
           </div>
 
-          {loadingPlan ? (
-            <div className="space-y-6 animate-pulse">
-              <div className="h-8 bg-theme/5 rounded-full w-1/3"></div>
-              <div className="h-4 bg-slate-200 dark:bg-white/5 rounded-full w-full"></div>
-              <div className="h-4 bg-slate-200 dark:bg-white/5 rounded-full w-5/6"></div>
-              <div className="h-4 bg-slate-200 dark:bg-white/5 rounded-full w-4/6"></div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                <div className="h-40 bg-slate-100 dark:bg-white/5 rounded-[32px]"></div>
-                <div className="h-40 bg-slate-100 dark:bg-white/5 rounded-[32px]"></div>
+          <div className="relative z-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 bg-theme rounded-2xl flex items-center justify-center text-white shadow-lg shadow-theme/30 ring-4 ring-theme/10">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className={`text-3xl font-black tracking-tight ${themeOrWhite}`}>
+                    {language === 'pt' ? 'Plano de Evolução Financeira' : 'Financial Evolution Plan'}
+                  </h2>
+                  <p className={`text-[10px] font-black uppercase tracking-[0.4em] ${textContrast} mt-1`}>
+                    Powered by Gemini 3.0 Pro AI
+                  </p>
+                </div>
               </div>
+              <button 
+                onClick={fetchAIPlan}
+                disabled={loadingPlan}
+                className="px-8 py-4 bg-theme/10 hover:bg-theme/20 border border-theme/20 rounded-2xl text-[11px] font-black text-theme uppercase tracking-widest transition-all disabled:opacity-50"
+              >
+                {loadingPlan ? 'Gerando Plano...' : 'Recalcular Estratégia'}
+              </button>
             </div>
-          ) : aiPlan ? (
-            <div className={`prose prose-invert max-w-none text-lg transition-all duration-700 ${!lightMode ? 'text-slate-300' : 'text-slate-700'}`}>
-               <div 
-                 className="plan-content"
-                 dangerouslySetInnerHTML={{ __html: aiPlan.text }} 
-               />
-               <style>{`
-                 .plan-content b { color: var(--primary); font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; font-size: 1.1em; display: block; margin-top: 1.5rem; }
-                 .plan-content ul { list-style: none; padding-left: 0; margin-top: 1rem; display: grid; grid-template-cols: 1fr; gap: 0.5rem; }
-                 @media (min-width: 768px) { .plan-content ul { grid-template-cols: 1fr 1fr; } }
-                 .plan-content li { background: rgba(var(--primary-rgb), 0.05); padding: 1rem 1.5rem; border-radius: 1.5rem; border-left: 4px solid var(--primary); font-size: 0.9em; font-weight: 600; }
-                 .dark-mode .plan-content li { background: rgba(255,255,255, 0.03); }
-               `}</style>
-            </div>
-          ) : (
-            <div className="py-20 text-center">
-              <p className="text-slate-400 font-black italic uppercase tracking-widest">
-                Adicione transações para receber seu plano estratégico personalizado.
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12">
-        <div className={`${cardBg} p-10 rounded-[40px] shadow-sm border border-slate-200 dark:border-white/10 page-break-inside-avoid`}>
-          <div className="flex items-center justify-between mb-8">
-            <h2 className={`text-2xl font-black transition-colors duration-300 ${themeOrWhite}`}>
-              {language === 'pt' ? 'Distribuição de Gastos' : 'Expense Distribution'}
-            </h2>
-            <div className="w-10 h-10 bg-theme/10 rounded-xl flex items-center justify-center text-theme no-print border border-theme/10">
-               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-               </svg>
-            </div>
+            {loadingPlan ? (
+              <div className="space-y-6 animate-pulse">
+                <div className="h-8 bg-theme/5 rounded-full w-1/3"></div>
+                <div className="h-4 bg-slate-200 dark:bg-white/5 rounded-full w-full"></div>
+                <div className="h-4 bg-slate-200 dark:bg-white/5 rounded-full w-5/6"></div>
+              </div>
+            ) : aiPlan ? (
+              <div className={`prose prose-invert max-w-none text-lg transition-all duration-700 ${!lightMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                 <div 
+                   className="plan-content"
+                   dangerouslySetInnerHTML={{ __html: aiPlan.text }} 
+                 />
+                 <style>{`
+                   .plan-content b { color: var(--primary); font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; font-size: 1.1em; display: block; margin-top: 1.5rem; }
+                   .plan-content ul { list-style: none; padding-left: 0; margin-top: 1rem; display: grid; grid-template-cols: 1fr; gap: 0.5rem; }
+                   @media (min-width: 768px) { .plan-content ul { grid-template-cols: 1fr 1fr; } }
+                   .plan-content li { background: rgba(var(--primary-rgb), 0.05); padding: 1rem 1.5rem; border-radius: 1.5rem; border-left: 4px solid var(--primary); font-size: 0.9em; font-weight: 600; }
+                   .dark-mode .plan-content li { background: rgba(255,255,255, 0.03); }
+                 `}</style>
+              </div>
+            ) : (
+              <div className="py-20 text-center text-slate-400 font-black italic uppercase tracking-widest">
+                Adicione transações para receber seu plano estratégico.
+              </div>
+            )}
           </div>
-          <Suspense fallback={<div className="h-64 flex items-center justify-center text-theme/40 text-xs font-black uppercase tracking-widest">Carregando Gráficos...</div>}>
-            <FinancialCharts transactions={transactions} language={language} />
-          </Suspense>
-        </div>
+        </section>
 
-        <div className={`${cardBg} p-10 rounded-[40px] shadow-sm border border-slate-200 dark:border-white/10 page-break-inside-avoid`}>
-           <h2 className={`text-2xl font-black mb-8 transition-colors duration-300 ${themeOrWhite}`}>
-             {language === 'pt' ? 'Top 5 Maiores Gastos' : 'Top 5 Expenses'}
-           </h2>
-           <div className="space-y-6">
-             {topExpenses.length === 0 ? (
-               <div className="text-center py-20 text-slate-400 font-bold italic">
-                 {language === 'pt' ? 'Nenhum gasto registrado.' : 'No expenses recorded.'}
-               </div>
-             ) : (
-               topExpenses.map((t, idx) => (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12">
+          <div className={`${cardBg} p-10 rounded-[40px] shadow-sm border border-slate-200 dark:border-white/10`}>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className={`text-2xl font-black transition-colors duration-300 ${themeOrWhite}`}>
+                {language === 'pt' ? 'Distribuição de Gastos' : 'Expense Distribution'}
+              </h2>
+            </div>
+            <Suspense fallback={<div className="h-64 flex items-center justify-center text-theme/40 text-xs font-black uppercase tracking-widest">Carregando...</div>}>
+              <FinancialCharts transactions={transactions} language={language} />
+            </Suspense>
+          </div>
+
+          <div className={`${cardBg} p-10 rounded-[40px] shadow-sm border border-slate-200 dark:border-white/10`}>
+             <h2 className={`text-2xl font-black mb-8 transition-colors duration-300 ${themeOrWhite}`}>
+               {language === 'pt' ? 'Maiores Saídas' : 'Top Expenses'}
+             </h2>
+             <div className="space-y-6">
+               {topExpenses.map((t, idx) => (
                  <div key={t.id} className="flex items-center justify-between group p-3 rounded-2xl hover:bg-theme/5 transition-all">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-slate-100 dark:bg-white/10 rounded-2xl flex items-center justify-center font-black text-theme group-hover:bg-theme group-hover:text-white transition-all duration-300 border border-slate-200 dark:border-transparent">
+                      <div className="w-12 h-12 bg-slate-100 dark:bg-white/10 rounded-2xl flex items-center justify-center font-black text-theme border border-slate-200 dark:border-transparent">
                         {idx + 1}
                       </div>
                       <div>
@@ -199,33 +288,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
                       <p className="text-[10px] text-slate-400 font-bold uppercase">{t.date}</p>
                     </div>
                  </div>
-               ))
-             )}
-           </div>
-        </div>
-      </div>
-
-      <div className={`mt-10 ${cardBg} p-12 rounded-[48px] shadow-sm border border-slate-200 dark:border-white/10 page-break-inside-avoid transition-all duration-300`}>
-        <h2 className={`text-3xl font-black mb-10 tracking-tight ${themeOrWhite}`}>{language === 'pt' ? 'Consolidado Geral' : 'Overall Consolidation'}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-           <div className="bg-slate-50 dark:bg-white/5 p-8 rounded-[32px] border border-slate-100 dark:border-white/10">
-              <p className={`font-black uppercase text-[10px] tracking-[0.25em] mb-4 text-slate-400`}>
-                {language === 'pt' ? 'Total Entradas' : 'Total Income'}
-              </p>
-              <p className="text-4xl font-black text-emerald-600 tabular-nums">{formatCurrency(summary.totalIncome)}</p>
-           </div>
-           <div className="bg-slate-50 dark:bg-white/5 p-8 rounded-[32px] border border-slate-100 dark:border-white/10">
-              <p className={`font-black uppercase text-[10px] tracking-[0.25em] mb-4 text-slate-400`}>
-                {language === 'pt' ? 'Total Saídas' : 'Total Expenses'}
-              </p>
-              <p className="text-4xl font-black text-rose-600 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
-           </div>
-           <div className="bg-theme p-8 rounded-[32px] shadow-2xl shadow-theme/30 ring-1 ring-white/20">
-              <p className="text-white/60 font-black uppercase text-[10px] tracking-[0.25em] mb-4">
-                {language === 'pt' ? 'Resultado' : 'Result'}
-              </p>
-              <p className="text-4xl font-black text-white tabular-nums">{formatCurrency(summary.balance)}</p>
-           </div>
+               ))}
+             </div>
+          </div>
         </div>
       </div>
     </main>

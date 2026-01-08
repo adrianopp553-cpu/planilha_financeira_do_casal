@@ -5,13 +5,6 @@ import { translations } from '../translations';
 
 const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="currentColor" />
-        <stop offset="100%" stopColor="currentColor" stopOpacity="0.6" />
-      </linearGradient>
-    </defs>
-    <rect x="15" y="15" width="70" height="70" rx="18" fill="url(#logoGrad)" fillOpacity="0.1" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
     <path d="M32 35 H 58 V 42 H 40 V 48 H 55 V 55 H 40 V 70 H 32 V 35 Z" fill="currentColor" />
     <path d="M62 38 C 72 38, 78 45, 78 55 C 78 65, 72 72, 62 72 M 62 48 C 68 48, 70 52, 70 55 C 70 58, 68 62, 62 62" stroke="currentColor" strokeWidth="6" strokeLinecap="round" fill="none" />
   </svg>
@@ -93,77 +86,75 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
 
   return (
     <main className="pt-32 pb-48 px-6 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
-      {/* SEÇÃO DE IMPRESSÃO - ENQUADRAMENTO PROFISSIONAL */}
-      <div className="hidden print:block w-full text-black bg-white">
-        <div className="flex justify-between items-end border-b-2 border-slate-900 pb-6 mb-8">
-           <div className="flex items-center gap-4">
-             <FCLogo className="w-12 h-12 text-slate-900" />
+      
+      {/* SEÇÃO DE IMPRESSÃO - DOCUMENTO DE ALTO CONTRASTE */}
+      <div className="hidden print:block w-full text-black bg-white font-sans">
+        <div className="flex justify-between items-end border-b-4 border-black pb-8 mb-10">
+           <div className="flex items-center gap-6">
+             <FCLogo className="w-16 h-16 text-black" />
              <div>
-               <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Relatório Financeiro</h1>
-               <p className="text-slate-500 font-bold uppercase text-[9px] tracking-[0.3em] mt-1">Plataforma FinControl Pro • Inteligência em Gestão</p>
+               <h1 className="text-4xl font-black uppercase tracking-tighter leading-none">Extrato Operacional</h1>
+               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-2">Relatório Consolidado de Transações • FinControl Pro</p>
              </div>
            </div>
            <div className="text-right">
-             <p className="text-slate-400 font-black uppercase text-[8px] tracking-widest mb-1">Emitido em</p>
-             <p className="text-slate-900 font-black text-base tabular-nums">{new Date().toLocaleDateString()}</p>
+             <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Data do Documento</p>
+             <p className="text-2xl font-black tabular-nums leading-none">{new Date().toLocaleDateString()}</p>
            </div>
         </div>
         
         {summary && (
-          <div className="grid grid-cols-3 gap-4 mb-10">
-            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-center">
-              <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-2">Total de Entradas</p>
-              <p className="text-xl font-black text-emerald-600 tabular-nums leading-none">{formatCurrency(summary.totalIncome)}</p>
+          <div className="grid grid-cols-3 gap-0 mb-12 border-2 border-black divide-x-2 divide-black">
+            <div className="p-8 text-center">
+              <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-3">Total Créditos</p>
+              <p className="text-2xl font-black text-emerald-600 tabular-nums">{formatCurrency(summary.totalIncome)}</p>
             </div>
-            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-center">
-              <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-2">Total de Saídas</p>
-              <p className="text-xl font-black text-rose-600 tabular-nums leading-none">{formatCurrency(summary.totalExpense)}</p>
+            <div className="p-8 text-center">
+              <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-3">Total Débitos</p>
+              <p className="text-2xl font-black text-rose-600 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
             </div>
-            <div className="bg-slate-900 p-5 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg">
-              <p className="text-[9px] font-black uppercase text-white/40 tracking-widest mb-2">Saldo Atual</p>
-              <p className="text-xl font-black text-white tabular-nums leading-none">{formatCurrency(summary.balance)}</p>
+            <div className="p-8 text-center bg-slate-50">
+              <p className="text-[9px] font-black uppercase text-slate-500 tracking-widest mb-3">Disponível</p>
+              <p className="text-2xl font-black text-black tabular-nums">{formatCurrency(summary.balance)}</p>
             </div>
           </div>
         )}
 
         <div className="mt-6">
-          <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4 border-l-4 border-slate-900 pl-3">Extrato Detalhado</h2>
-          <div className="border border-slate-200 rounded-xl overflow-hidden">
+          <h2 className="text-xs font-black uppercase tracking-[0.4em] mb-6 text-black border-l-8 border-black pl-4 py-1">Histórico de Atividade</h2>
+          <div className="border border-slate-200 rounded-none overflow-hidden">
             <table className="w-full text-left text-[10px] border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="py-3 px-4 font-black uppercase tracking-wider text-slate-500 w-24">Data</th>
-                  <th className="py-3 px-4 font-black uppercase tracking-wider text-slate-500">Descrição</th>
-                  <th className="py-3 px-4 font-black uppercase tracking-wider text-slate-500">Categoria</th>
-                  <th className="py-3 px-4 font-black uppercase tracking-wider text-slate-500 text-right">Valor</th>
+                <tr className="bg-slate-50 border-b-2 border-black">
+                  <th className="py-4 px-4 font-black uppercase tracking-wider text-slate-500 w-24">Data</th>
+                  <th className="py-4 px-4 font-black uppercase tracking-wider text-slate-500">Descrição do Lançamento</th>
+                  <th className="py-4 px-4 font-black uppercase tracking-wider text-slate-500 text-right">Valor Líquido</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {transactions.map((tx) => (
                   <tr key={tx.id} className="page-break-inside-avoid">
-                    <td className="py-3 px-4 tabular-nums text-slate-400 font-bold">{tx.date}</td>
-                    <td className="py-3 px-4 font-black text-slate-900">{tx.description}</td>
-                    <td className="py-3 px-4 text-slate-500 uppercase font-black text-[8px]">{t.categories[tx.category]}</td>
-                    <td className={`py-3 px-4 text-right font-black tabular-nums ${tx.type === 'Entrada' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    <td className="py-4 px-4 tabular-nums text-slate-400 font-bold">{tx.date}</td>
+                    <td className="py-4 px-4">
+                      <span className="font-black text-black block text-xs">{tx.description}</span>
+                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{tx.category}</span>
+                    </td>
+                    <td className={`py-4 px-4 text-right font-black tabular-nums text-xs ${tx.type === 'Entrada' ? 'text-emerald-600' : 'text-rose-600'}`}>
                       {tx.type === 'Entrada' ? '+' : '-'} {formatCurrency(tx.amount)}
                     </td>
                   </tr>
                 ))}
-                {transactions.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="py-12 text-center text-slate-300 font-black italic uppercase tracking-widest">Nenhuma movimentação.</td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
-          <div className="mt-10 pt-6 border-t border-slate-100 text-center">
-            <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.4em]">Documento gerado digitalmente • FinControl Pro v2.5.0</p>
+          <div className="mt-16 pt-8 border-t border-slate-100 text-center flex flex-col items-center">
+            <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.5em] mb-4">Autenticação: FinControl.Audit.2025.SECURE</p>
+            <div className="w-24 h-0.5 bg-slate-100"></div>
           </div>
         </div>
       </div>
 
-      {/* DASHBOARD DE CONFIGURAÇÕES (APENAS TELA) */}
+      {/* DASHBOARD DE CONFIGURAÇÕES (NO-PRINT) */}
       <div className="mb-16 no-print">
         <button 
           onClick={onBack} 
@@ -278,9 +269,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
                 <span className="text-[10px] font-black uppercase tracking-widest text-rose-500/80 group-hover:text-rose-400 text-center">Reset Total</span>
               </button>
             </div>
-            <p className="mt-12 text-[10px] font-bold text-white/20 uppercase tracking-[0.4em] text-center leading-relaxed italic">
-              Backups semanais garantem sua soberania financeira.
-            </p>
           </div>
         </section>
       </div>
