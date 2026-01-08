@@ -1,7 +1,7 @@
 
 export const translations = {
   pt: {
-    dashboard: "Dashboard",
+    dashboard: "Início",
     results: "Resultados",
     settings: "Configurações",
     couplePlans: "Planejamento",
@@ -37,6 +37,17 @@ export const translations = {
     fontSize: "Tamanho do Texto",
     fontFamily: "Estilo da Fonte",
     saveAndBack: "SALVAR E VOLTAR",
+    aboutProject: "O Ecossistema",
+    howItWorks: "Como Funciona",
+    purposeTitle: "Finalidade",
+    purposeText: "Capacitar indivíduos e casais a atingirem a soberania financeira através de dados e inteligência artificial de última geração.",
+    developedBy: "Desenvolvido por",
+    devTeam: "Adriano P. Santos",
+    steps: [
+      { title: "Alimentação", desc: "Você insere seus ganhos e gastos de forma simples e rápida." },
+      { title: "Inteligência", desc: "Nossa IA Gemini Pro processa os padrões e identifica gargalos ocultos." },
+      { title: "Evolução", desc: "Você recebe planos de ação e relatórios exportáveis para o mundo real." }
+    ],
     categories: {
       INCOME: "💎 Renda",
       HOUSING: "🛸 Moradia",
@@ -49,7 +60,7 @@ export const translations = {
     }
   },
   en: {
-    dashboard: "Dashboard",
+    dashboard: "Home",
     results: "Results",
     settings: "Settings",
     couplePlans: "Planning",
@@ -85,6 +96,17 @@ export const translations = {
     fontSize: "Text Size",
     fontFamily: "Font Style",
     saveAndBack: "SAVE AND BACK",
+    aboutProject: "The Ecosystem",
+    howItWorks: "How it Works",
+    purposeTitle: "Purpose",
+    purposeText: "Empower individuals and couples to achieve financial sovereignty through data and cutting-edge artificial intelligence.",
+    developedBy: "Developed by",
+    devTeam: "Adriano P. Santos",
+    steps: [
+      { title: "Data Input", desc: "You enter your income and expenses quickly and simply." },
+      { title: "Intelligence", desc: "Our Gemini Pro AI processes patterns and identifies hidden bottlenecks." },
+      { title: "Evolution", desc: "You receive action plans and exportable reports for the real world." }
+    ],
     categories: {
       INCOME: "💎 Income",
       HOUSING: "🛸 Housing",
@@ -97,7 +119,7 @@ export const translations = {
     }
   },
   es: {
-    dashboard: "Panel",
+    dashboard: "Inicio",
     results: "Resultados",
     settings: "Ajustes",
     couplePlans: "Planificación",
@@ -125,7 +147,7 @@ export const translations = {
     whatHappened: "¿Qué pasó?",
     type: "Tipo",
     confirm: "Confirmar Registro",
-    update: "Actualizar Datos",
+    update: "Atualizar Datos",
     nightMode: "Modo Noche",
     language: "Idioma",
     palette: "Paleta de Colores",
@@ -133,6 +155,17 @@ export const translations = {
     fontSize: "Tamaño de Texto",
     fontFamily: "Estilo de Fuente",
     saveAndBack: "GUARDAR Y VOLVER",
+    aboutProject: "El Ecosistema",
+    howItWorks: "Cómo Funciona",
+    purposeTitle: "Finalidad",
+    purposeText: "Capacitar a personas y parejas para lograr la soberanía financiera mediante datos e inteligencia artificial de vanguardia.",
+    developedBy: "Desarrollado por",
+    devTeam: "Adriano P. Santos",
+    steps: [
+      { title: "Entrada", desc: "Ingresas tus ingresos y gastos de forma rápida y sencilla." },
+      { title: "Inteligencia", desc: "Nuestra IA Gemini Pro procesa patrones e identifica cuellos de botella." },
+      { title: "Evolución", desc: "Recibes planes de acción y informes exportables para el mundo real." }
+    ],
     categories: {
       INCOME: "💎 Ingresos",
       HOUSING: "🛸 Vivienda",

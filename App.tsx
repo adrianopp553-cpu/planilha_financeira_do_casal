@@ -10,32 +10,14 @@ const FinancialCharts = lazy(() => import('./components/FinancialCharts'));
 const AIAssistant = lazy(() => import('./components/AIAssistant'));
 const ResultsView = lazy(() => import('./components/ResultsView'));
 const SettingsView = lazy(() => import('./components/SettingsView'));
+const AboutSection = lazy(() => import('./components/AboutSection'));
 
 const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="currentColor" />
-        <stop offset="100%" stopColor="currentColor" stopOpacity="0.6" />
-      </linearGradient>
-    </defs>
-    {/* Background geométrico moderno */}
-    <rect x="15" y="15" width="70" height="70" rx="18" fill="url(#logoGrad)" fillOpacity="0.1" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
-    
-    {/* Letra F */}
-    <path 
-      d="M32 35 H 58 V 42 H 40 V 48 H 55 V 55 H 40 V 70 H 32 V 35 Z" 
-      fill="currentColor" 
-    />
-    
-    {/* Letra C interligada */}
-    <path 
-      d="M62 38 C 72 38, 78 45, 78 55 C 78 65, 72 72, 62 72 M 62 48 C 68 48, 70 52, 70 55 C 70 58, 68 62, 62 62" 
-      stroke="currentColor" 
-      strokeWidth="6" 
-      strokeLinecap="round" 
-      fill="none"
-    />
+    <rect x="20" y="20" width="60" height="60" rx="12" stroke="currentColor" strokeWidth="4" />
+    <path d="M35 35 H 55 V 42 H 42 V 48 H 52 V 54 H 42 V 65 H 35 Z" fill="currentColor" />
+    <path d="M65 35 V 65 M 65 35 H 55 M 65 65 H 55" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+    <text x="50" y="85" textAnchor="middle" fontSize="12" fontWeight="900" fill="currentColor">PRO</text>
   </svg>
 );
 
@@ -65,7 +47,7 @@ const App: React.FC = () => {
   
   const [settings, setSettings] = useState<AppSettings>({
     language: 'pt',
-    theme: 'forest', // Alterado de 'classic' para 'forest' (Verde padrão)
+    theme: 'forest',
     lightMode: false,
     fontSize: 'medium',
     fontFamily: 'sans'
@@ -117,7 +99,7 @@ const App: React.FC = () => {
 
   if (!isLoaded) return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black gap-6">
-      <FCLogo className="w-20 h-20 text-emerald-500 animate-pulse" /> {/* Alterado para Emerald/Verde */}
+      <FCLogo className="w-20 h-20 text-emerald-400 animate-pulse" />
       <p className="text-theme font-black tracking-[0.6em] text-[10px] uppercase opacity-50">Iniciando Core Engine...</p>
     </div>
   );
@@ -151,20 +133,20 @@ const App: React.FC = () => {
               {/* Hero Section */}
               <section className="pt-48 pb-32 px-6 text-center relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-theme/5 rounded-full blur-[160px] pointer-events-none opacity-50 animate-pulse"></div>
-                <h1 className="text-6xl md:text-9xl font-black text-gray-900 dark:text-white mb-10 tracking-tighter leading-[0.9] perspective-1000">
-                  {t.harmony} <br />
+                <h1 className="text-6xl md:text-9xl font-black text-gray-900 dark:text-white mb-10 tracking-tighter leading-[0.9] perspective-1000 uppercase">
+                  Relatório de <br />
                   <span className="text-theme inline-block hover:scale-105 transition-transform cursor-default" style={{ filter: 'drop-shadow(0 0 20px var(--primary-shadow))' }}>
-                    {t.relationship}
+                    Saúde Financeira
                   </span>
                 </h1>
-                <p className="text-xl md:text-2xl text-gray-500 dark:text-white/60 max-w-3xl mx-auto mb-16 font-medium leading-relaxed italic">{t.subtitle}</p>
+                <p className="text-xs tracking-[0.5em] text-gray-400 uppercase font-black mb-16">Análise Prospectiva & Inteligência de Dados • PRO EDITION</p>
                 <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-                  <button onClick={() => document.getElementById('dash-content')?.scrollIntoView({ behavior: 'smooth' })} className="w-full md:w-auto px-16 py-7 bg-theme text-white font-black uppercase tracking-widest text-xs rounded-3xl shadow-2xl shadow-theme/40 hover:brightness-110 active:scale-95 transition-all duration-500">{t.startPlanning}</button>
+                  <button onClick={() => document.getElementById('dash-content')?.scrollIntoView({ behavior: 'smooth' })} className="w-full md:w-auto px-16 py-7 bg-theme text-black font-black uppercase tracking-widest text-xs rounded-3xl shadow-2xl shadow-theme/40 hover:brightness-110 active:scale-95 transition-all duration-500">Acessar Painel</button>
                   <button onClick={() => navigateTo('results')} className="w-full md:w-auto px-16 py-7 bg-white dark:bg-white/5 text-gray-900 dark:text-white font-black uppercase tracking-widest text-xs rounded-3xl border border-black/5 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 transition-all">{t.results}</button>
                 </div>
               </section>
 
-              <main id="dash-content" className="max-w-7xl mx-auto px-6 pb-40 scroll-mt-24 relative z-10">
+              <main id="dash-content" className="max-w-7xl mx-auto px-6 pb-24 scroll-mt-24 relative z-10">
                 <SummaryCards summary={summary} language={settings.language} />
                 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mt-16">
@@ -201,6 +183,9 @@ const App: React.FC = () => {
                   </div>
                 </div>
               </main>
+
+              {/* Seção Sobre o Ecossistema movida para o final da página */}
+              <AboutSection language={settings.language} lightMode={settings.lightMode} />
             </div>
           ) : view === 'results' ? (
             <ResultsView transactions={transactions} summary={summary} onBack={() => navigateTo('home')} language={settings.language} lightMode={settings.lightMode} />
@@ -214,11 +199,11 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto text-center space-y-8">
           <div className="flex items-center justify-center gap-4">
             <FCLogo className="h-10 w-10 text-theme" />
-            <span className="text-xl font-black tracking-tighter">FinControl <span className="text-theme">Pro</span></span>
+            <span className="text-xl font-black tracking-tighter uppercase">FinControl <span className="text-theme">Pro</span></span>
           </div>
           <p className="text-[10px] text-gray-400 dark:text-white/20 font-black uppercase tracking-[0.6em] max-w-sm mx-auto leading-relaxed italic">Engineered for absolute financial sovereignty. v2.5.0 Premium</p>
           <div className="pt-8 border-t border-black/5 dark:border-white/5">
-            <p className="text-[9px] text-gray-300 dark:text-white/10 font-bold uppercase tracking-widest">© 2025 STARK INDUSTRIES FINANCIAL DIV.</p>
+            <p className="text-[9px] text-gray-300 dark:text-white/10 font-bold uppercase tracking-widest">© 2025 ADRIANO P. SANTOS INDUSTRIES</p>
           </div>
         </div>
       </footer>
