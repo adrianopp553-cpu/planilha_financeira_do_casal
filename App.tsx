@@ -12,12 +12,15 @@ const ResultsView = lazy(() => import('./components/ResultsView.tsx'));
 const SettingsView = lazy(() => import('./components/SettingsView.tsx'));
 const AboutSection = lazy(() => import('./components/AboutSection.tsx'));
 
-const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
+const FCLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="20" y="20" width="60" height="60" rx="12" stroke="currentColor" strokeWidth="4" />
-    <path d="M35 35 H 55 V 42 H 42 V 48 H 52 V 54 H 42 V 65 H 35 Z" fill="currentColor" />
-    <path d="M65 35 V 65 M 65 35 H 55 M 65 65 H 55" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-    <text x="50" y="85" textAnchor="middle" fontSize="12" fontWeight="900" fill="currentColor">PRO</text>
+    {/* Borda externa do Squircle */}
+    <rect x="5" y="5" width="90" height="90" rx="28" stroke="currentColor" strokeWidth="2.5" className="opacity-40" />
+    {/* Borda interna Emerald */}
+    <rect x="22" y="22" width="56" height="56" rx="14" stroke="#00ffa3" strokeWidth="4" />
+    {/* Glifo F] */}
+    <path d="M40 38 H 55 V 43 H 45 V 48 H 53 V 53 H 45 V 62 H 40 Z" fill="white" />
+    <path d="M62 38 V 62 M 62 38 H 58 M 62 62 H 58" stroke="white" strokeWidth="3" strokeLinecap="round" />
   </svg>
 );
 
@@ -106,14 +109,16 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative z-10 selection:bg-theme selection:text-white" style={{ fontFamily: 'var(--app-font)' }}>
-      {/* Navbar Minimalista */}
+      {/* Navbar com Novo Logo Estilizado */}
       <nav className="fixed top-0 w-full z-50 border-b border-black/5 dark:border-white/10 bg-white/60 dark:bg-black/40 backdrop-blur-3xl transition-all duration-500 no-print">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4 cursor-pointer group" onClick={() => navigateTo('home')}>
-            <div className="w-12 h-12 bg-theme/10 rounded-2xl flex items-center justify-center shadow-inner border border-theme/20 transition-all group-hover:scale-105 group-hover:-rotate-3">
-              <FCLogo className="h-8 w-8 text-theme" />
+          <div className="flex items-center gap-5 cursor-pointer group" onClick={() => navigateTo('home')}>
+            <div className="w-14 h-14 bg-black dark:bg-white/5 rounded-2xl flex items-center justify-center shadow-2xl border border-white/10 transition-all group-hover:scale-105 group-hover:-rotate-2">
+              <FCLogo className="h-10 w-10 text-white" />
             </div>
-            <span className="text-2xl font-black text-gray-900 dark:text-white tracking-tighter">Fin<span className="text-theme">Control</span></span>
+            <span className="text-3xl font-black text-gray-900 dark:text-white tracking-tighter">
+              Fin<span className="text-theme">Control</span>
+            </span>
           </div>
           
           <div className="hidden md:flex items-center gap-2 p-1.5 bg-gray-100 dark:bg-white/5 rounded-3xl border border-black/5 dark:border-white/10">

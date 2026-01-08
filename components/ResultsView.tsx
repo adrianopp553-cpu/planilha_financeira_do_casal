@@ -16,8 +16,10 @@ interface ResultsViewProps {
 
 const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M32 35 H 58 V 42 H 40 V 48 H 55 V 55 H 40 V 70 H 32 V 35 Z" fill="currentColor" />
-    <path d="M62 38 C 72 38, 78 45, 78 55 C 78 65, 72 72, 62 72 M 62 48 C 68 48, 70 52, 70 55 C 70 58, 68 62, 62 62" stroke="currentColor" strokeWidth="6" strokeLinecap="round" fill="none" />
+    {/* Versão simplificada para relatórios de alto impacto */}
+    <rect x="15" y="15" width="70" height="70" rx="18" stroke="currentColor" strokeWidth="4" />
+    <path d="M35 35 H 55 V 42 H 42 V 48 H 52 V 54 H 42 V 65 H 35 Z" fill="currentColor" />
+    <path d="M65 35 V 65 M 65 35 H 55 M 65 65 H 55" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
   </svg>
 );
 
@@ -26,7 +28,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
   const [loadingPlan, setLoadingPlan] = useState(false);
 
   const themeOrWhite = !lightMode ? 'text-white' : 'text-slate-900';
-  const textContrast = !lightMode ? 'text-slate-300' : 'text-slate-600';
   const cardBg = !lightMode ? 'bg-white/[0.03]' : 'bg-white/95';
 
   const formatCurrency = (val: number) => 
@@ -82,7 +83,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
   return (
     <main className="pt-24 pb-32 px-6 max-w-7xl mx-auto animate-in fade-in duration-500">
       
-      {/* SEÇÃO DE IMPRESSÃO (PDF) - Otimizada para fundo branco */}
+      {/* SEÇÃO DE IMPRESSÃO (PDF) */}
       <div className="hidden print:block w-full text-slate-900 bg-white font-sans p-4">
         <div className="flex justify-between items-start border-b-4 border-theme pb-6 mb-8">
           <div className="flex items-center gap-6">
@@ -100,7 +101,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
           </div>
         </div>
 
-        {/* Resumo PDF com fundo branco e bordas */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="p-4 rounded-xl border-2 border-emerald-100 bg-emerald-50/10">
             <p className="text-[7px] font-black uppercase tracking-widest text-emerald-600 mb-1">Créditos</p>
@@ -143,6 +143,22 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
           </div>
         </div>
 
+        {/* PLANO AI INTEGRADO AO PDF */}
+        {aiPlan && (
+          <div className="mb-10 p-8 rounded-2xl border-2 border-theme bg-theme/5">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-theme mb-6 flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Plano de Evolução Estratégico (AI)
+            </h2>
+            <div 
+              className="text-[10px] leading-relaxed text-slate-800 space-y-4"
+              dangerouslySetInnerHTML={{ __html: aiPlan.text }}
+            />
+          </div>
+        )}
+
         <div className="mb-10 page-break-before">
            <h2 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-900 mb-4 border-l-4 border-theme pl-3">Histórico Mensal</h2>
            <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
@@ -171,7 +187,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
            </div>
         </div>
 
-        {/* CONSELHO EM BRANCO - ÁREA LIMPA PARA NOTAS OU REFLEXÃO */}
+        {/* DICA FINAL DE INTUIÇÃO */}
         <div className="mt-8 pt-8 border-t-2 border-slate-100 text-center flex flex-col items-center bg-white">
            <div className="w-10 h-10 border-2 border-theme rounded-xl flex items-center justify-center text-theme mb-3">
              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -179,9 +195,13 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
              </svg>
            </div>
            <p className="text-[9px] font-black text-theme uppercase tracking-[0.4em] mb-2">Mindset de Prosperidade</p>
-           {/* Dica deixada em branco conforme solicitado */}
-           <div className="h-12 w-full max-w-xl border-b border-dashed border-slate-200 mb-4"></div>
-           <p className="text-[7px] font-bold text-slate-300 uppercase tracking-widest italic">Análise de Evolução • FinControl Pro v2.5</p>
+           <p className="text-[11px] font-bold text-slate-800 max-w-lg mb-4 italic">
+             {summary.balance > 0 
+               ? "Seu saldo positivo é a semente do seu império. Não gaste o amanhã com os desejos de hoje." 
+               : "Momentos de ajuste são fundações para grandes saltos. Reavalie cada centavo como uma unidade de liberdade."}
+           </p>
+           <div className="w-24 h-0.5 bg-theme/20 mb-4"></div>
+           <p className="text-[7px] font-bold text-slate-300 uppercase tracking-widest italic">Documento Auditado por FinControl AI v2.5</p>
         </div>
       </div>
 
@@ -196,7 +216,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
         </div>
         <div className="flex gap-3">
           <button onClick={handleExportPDF} className="px-6 py-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-700 dark:text-white/80 hover:bg-slate-50 transition-all flex items-center gap-2">
-             PDF
+             Exportar PDF
           </button>
           <button onClick={() => window.print()} className="px-6 py-4 bg-theme text-black rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-theme/20 hover:scale-105 transition-all flex items-center gap-2">
              Imprimir
