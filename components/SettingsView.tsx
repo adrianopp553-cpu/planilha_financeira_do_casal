@@ -101,7 +101,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ settings, onUpdate, onBack,
            </div>
            <div className="text-right">
              <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Data do Documento</p>
-             <p className="text-2xl font-black tabular-nums leading-none">{new Date().toLocaleDateString()}</p>
+             <p className="text-2xl font-black tabular-nums leading-none text-theme">{new Date().toLocaleDateString()}</p>
            </div>
         </div>
         

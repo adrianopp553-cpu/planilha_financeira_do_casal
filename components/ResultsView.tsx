@@ -1,5 +1,5 @@
 
-import React, { lazy, Suspense, useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useMemo } from 'react';
 import { Transaction, FinancialSummary, TransactionType, AIAnalysisResult } from '../types';
 import { generateImprovementPlan } from '../services/geminiService';
 import SummaryCards from './SummaryCards';
@@ -35,6 +35,23 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
       currency: language === 'pt' ? 'BRL' : 'USD' 
     }).format(val);
 
+  // Filtro de Transações do Último Mês (30 dias) para o PDF
+  const lastMonthTransactions = useMemo(() => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    return transactions.filter(t => {
+      // Converte string DD/MM/AAAA para objeto Date
+      const [day, month, year] = t.date.split('/').map(Number);
+      const txDate = new Date(year, month - 1, day);
+      return txDate >= thirtyDaysAgo;
+    }).sort((a, b) => {
+      const dateA = new Date(a.date.split('/').reverse().join('-'));
+      const dateB = new Date(b.date.split('/').reverse().join('-'));
+      return dateB.getTime() - dateA.getTime();
+    });
+  }, [transactions]);
+
   const topExpenses = [...transactions]
     .filter(t => t.type === TransactionType.EXPENSE)
     .sort((a, b) => b.amount - a.amount)
@@ -67,7 +84,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
   return (
     <main className="pt-24 pb-32 px-6 max-w-7xl mx-auto animate-in fade-in duration-500">
       
-      {/* SEÇÃO DE IMPRESSÃO (PDF) - Otimizada para ser técnica e clara */}
+      {/* SEÇÃO DE IMPRESSÃO (PDF) - REESTRUTURADA */}
       <div className="hidden print:block w-full text-slate-900 bg-white font-sans">
         <div className="flex justify-between items-start border-b-[8px] border-theme pb-8 mb-8">
           <div className="flex items-center gap-6">
@@ -80,11 +97,12 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
             </div>
           </div>
           <div className="text-right">
-             <p className="text-2xl font-black tabular-nums">{new Date().toLocaleDateString()}</p>
+             <p className="text-2xl font-black tabular-nums text-theme">{new Date().toLocaleDateString()}</p>
              <p className="text-[8px] font-black uppercase text-theme mt-1">Status: Consolidado</p>
           </div>
         </div>
 
+        {/* Resumo Financeiro PDF */}
         <div className="grid grid-cols-3 gap-4 mb-10">
           <div className="p-6 rounded-[24px] border border-emerald-100 bg-emerald-50/20">
             <p className="text-[8px] font-black uppercase tracking-widest text-emerald-600 mb-1">Créditos</p>
@@ -94,13 +112,13 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
             <p className="text-[8px] font-black uppercase tracking-widest text-rose-500 mb-1">Débitos</p>
             <p className="text-2xl font-black text-rose-500 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
           </div>
-          <div className="p-6 rounded-[24px] bg-slate-900 text-white">
+          <div className="p-6 rounded-[24px] bg-slate-900 text-white shadow-xl shadow-slate-200">
             <p className="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1">Disponível</p>
             <p className="text-2xl font-black tabular-nums">{formatCurrency(summary.balance)}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-8">
+        <div className="grid grid-cols-12 gap-8 mb-12">
           <div className="col-span-7 bg-slate-50 p-8 rounded-[32px] border border-slate-200">
             <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-900 mb-6 border-l-4 border-theme pl-4">Distribuição Analítica</h2>
             <Suspense fallback={null}>
@@ -126,9 +144,61 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
             </div>
           </div>
         </div>
+
+        {/* HISTÓRICO MENSAL - NOVIDADE PDF */}
+        <div className="mb-12 page-break-before">
+           <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-900 mb-6 border-l-4 border-theme pl-4">Histórico Operacional (Últimos 30 dias)</h2>
+           <div className="border border-slate-100 rounded-[24px] overflow-hidden">
+             <table className="w-full text-left text-[9px] border-collapse">
+               <thead>
+                 <tr className="bg-slate-50 border-b border-slate-100">
+                   <th className="py-4 px-6 font-black uppercase tracking-wider text-slate-400">Data</th>
+                   <th className="py-4 px-6 font-black uppercase tracking-wider text-slate-400">Descrição</th>
+                   <th className="py-4 px-6 font-black uppercase tracking-wider text-slate-400">Categoria</th>
+                   <th className="py-4 px-6 font-black uppercase tracking-wider text-slate-400 text-right">Valor</th>
+                 </tr>
+               </thead>
+               <tbody className="divide-y divide-slate-50">
+                 {lastMonthTransactions.length === 0 ? (
+                   <tr>
+                     <td colSpan={4} className="py-10 text-center text-slate-400 font-bold uppercase tracking-widest">Nenhuma transação no período.</td>
+                   </tr>
+                 ) : (
+                   lastMonthTransactions.map((tx) => (
+                     <tr key={tx.id} className="hover:bg-slate-50/50">
+                       <td className="py-3 px-6 font-bold text-slate-500 tabular-nums">{tx.date}</td>
+                       <td className="py-3 px-6 font-black text-slate-900 uppercase">{tx.description}</td>
+                       <td className="py-3 px-6">
+                         <span className="text-[8px] font-black px-2 py-0.5 bg-slate-100 rounded text-slate-400 uppercase">{tx.category}</span>
+                       </td>
+                       <td className={`py-3 px-6 text-right font-black tabular-nums ${tx.type === TransactionType.INCOME ? 'text-emerald-600' : 'text-rose-600'}`}>
+                         {tx.type === TransactionType.INCOME ? '+' : '-'} {formatCurrency(tx.amount)}
+                       </td>
+                     </tr>
+                   ))
+                 )}
+               </tbody>
+             </table>
+           </div>
+        </div>
+
+        {/* CONSELHO DE EVOLUÇÃO - NOVIDADE PDF */}
+        <div className="mt-12 pt-10 border-t-2 border-slate-100 text-center flex flex-col items-center">
+           <div className="w-12 h-12 bg-theme/10 rounded-2xl flex items-center justify-center text-theme mb-4">
+             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+             </svg>
+           </div>
+           <p className="text-[10px] font-black text-theme uppercase tracking-[0.5em] mb-3">Mindset de Prosperidade</p>
+           <p className="text-lg font-black tracking-tight text-slate-900 max-w-xl italic leading-snug">
+             "A disciplina financeira é a ponte entre seus objetivos e a sua liberdade. Continue monitorando, ajustando e evoluindo."
+           </p>
+           <div className="mt-8 w-20 h-1 bg-theme/20 rounded-full"></div>
+           <p className="mt-6 text-[8px] font-bold text-slate-300 uppercase tracking-widest italic">Gerado automaticamente por FinControl Pro AI Analytics</p>
+        </div>
       </div>
 
-      {/* INTERFACE WEB (NO-PRINT) - Reduzida para ser mais compacta */}
+      {/* INTERFACE WEB (NO-PRINT) */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 no-print">
         <div>
           <button onClick={onBack} className="flex items-center gap-2 text-theme font-black text-[9px] uppercase tracking-widest mb-3 hover:gap-3 transition-all">
