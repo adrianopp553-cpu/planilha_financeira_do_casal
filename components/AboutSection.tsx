@@ -22,25 +22,24 @@ const AboutSection: React.FC<AboutSectionProps> = ({ language, lightMode }) => {
   const textContrast = !lightMode ? 'text-slate-400' : 'text-slate-500';
 
   return (
-    <section className="py-32 border-t border-black/[0.03] dark:border-white/[0.05] relative overflow-hidden">
+    <section className="py-24 border-t border-black/[0.03] dark:border-white/[0.05] relative overflow-hidden no-print">
       <div className="max-w-7xl mx-auto px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
           
-          {/* Lado Esquerdo: Metodologia */}
-          <div className="space-y-16">
+          <div className="space-y-12">
             <div>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.6em] text-theme mb-8 opacity-80">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-theme mb-8 opacity-70">
                 {t.howItWorks}
               </h2>
-              <div className="space-y-12">
+              <div className="space-y-10">
                 {t.steps.map((step: any, idx: number) => (
-                  <div key={idx} className="flex gap-10 group">
-                    <div className="flex-shrink-0 w-14 h-14 rounded-[22px] bg-theme/10 border border-theme/20 flex items-center justify-center text-theme font-black text-xl transition-all duration-500 group-hover:bg-theme group-hover:text-black group-hover:scale-110">
+                  <div key={idx} className="flex gap-8 group">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-theme/10 border border-theme/20 flex items-center justify-center text-theme font-black text-lg transition-all duration-500 group-hover:bg-theme group-hover:text-black">
                       {idx + 1}
                     </div>
                     <div>
-                      <h3 className={`text-xl font-black mb-3 ${themeOrWhite}`}>{step.title}</h3>
-                      <p className={`text-base font-medium leading-relaxed max-w-sm ${textContrast}`}>
+                      <h3 className={`text-lg font-black mb-2 ${themeOrWhite}`}>{step.title}</h3>
+                      <p className={`text-sm font-medium leading-relaxed max-w-sm ${textContrast}`}>
                         {step.desc}
                       </p>
                     </div>
@@ -50,37 +49,30 @@ const AboutSection: React.FC<AboutSectionProps> = ({ language, lightMode }) => {
             </div>
           </div>
 
-          {/* Lado Direito: Identidade e Autoria */}
-          <div className={`${cardBg} p-16 rounded-[64px] border border-black/5 dark:border-white/10 shadow-2xl relative`}>
+          <div className={`${cardBg} p-12 rounded-[56px] border border-black/5 dark:border-white/10 shadow-xl relative`}>
             <div className="relative z-10">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-theme mb-10">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-theme mb-8">
                 {t.purposeTitle}
               </h3>
-              <p className={`text-3xl font-black tracking-tighter leading-[1.1] mb-16 ${themeOrWhite}`}>
+              <p className={`text-2xl font-black tracking-tighter leading-tight mb-12 ${themeOrWhite}`}>
                 "{t.purposeText}"
               </p>
 
-              <div className="pt-12 border-t border-black/5 dark:border-white/10">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-10">
-                  {/* Container do Logo - Grande e Limpo */}
-                  <div className="relative">
-                    <div className="absolute -inset-4 bg-theme/20 blur-2xl rounded-full opacity-50"></div>
-                    <div className="relative w-32 h-32 rounded-[40px] bg-theme/5 border-2 border-theme/20 flex items-center justify-center text-theme transition-transform duration-700 hover:rotate-6">
-                      <FCLogo className="w-16 h-16" />
-                    </div>
+              <div className="pt-10 border-t border-black/5 dark:border-white/10">
+                <div className="flex flex-col sm:flex-row items-center gap-8">
+                  <div className="relative w-24 h-24 rounded-[32px] bg-theme/5 border-2 border-theme/20 flex items-center justify-center text-theme shadow-lg">
+                    <FCLogo className="w-12 h-12" />
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">
-                        Arquiteto do Ecossistema
-                      </p>
-                      <p className={`text-4xl font-black tracking-tighter ${themeOrWhite}`}>
-                        Adriano P. Santos
-                      </p>
-                    </div>
-                    <div className="inline-block px-5 py-2 rounded-xl bg-theme/10 border border-theme/20">
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-theme">Full-Stack Architect & IA Specialist</span>
+                  <div className="text-center sm:text-left">
+                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-1">
+                      DESENVOLVIDO POR
+                    </p>
+                    <p className={`text-3xl font-black tracking-tighter ${themeOrWhite} mb-3`}>
+                      Adriano P. Santos
+                    </p>
+                    <div className="inline-block px-4 py-1.5 rounded-lg bg-theme/10 border border-theme/20">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-theme">Arquiteto de Sistemas</span>
                     </div>
                   </div>
                 </div>
