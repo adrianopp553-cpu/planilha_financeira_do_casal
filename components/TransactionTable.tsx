@@ -17,6 +17,15 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, onDel
       style: 'currency', currency: language === 'pt' ? 'BRL' : 'USD' 
     }).format(val);
 
+  // Helper para separar o emoji do texto da categoria
+  const parseCategory = (catKey: string) => {
+    const fullString = tTr.categories[catKey as keyof typeof tTr.categories] || catKey;
+    const parts = fullString.split(' ');
+    const icon = parts[0];
+    const label = parts.slice(1).join(' ');
+    return { icon, label };
+  };
+
   return (
     <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl rounded-[32px] shadow-2xl shadow-black/5 border border-black/5 dark:border-white/5 overflow-hidden transition-all duration-500">
       <div className="overflow-x-auto">
@@ -47,53 +56,62 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, onDel
                 </td>
               </tr>
             ) : (
-              transactions.map((t) => (
-                <tr key={t.id} className="group hover:bg-theme/5 dark:hover:bg-theme/10 transition-all duration-300">
-                  <td className="px-6 py-4 text-[11px] font-bold text-gray-400 dark:text-gray-500 tabular-nums">
-                    {t.date}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-gray-800 dark:text-white group-hover:text-theme transition-colors">
-                        {t.description}
+              transactions.map((t) => {
+                const { icon, label } = parseCategory(t.category);
+                return (
+                  <tr key={t.id} className="group hover:bg-theme/5 dark:hover:bg-theme/10 transition-all duration-300">
+                    <td className="px-6 py-4 text-[11px] font-bold text-gray-400 dark:text-gray-500 tabular-nums">
+                      {t.date}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        {/* Container do Ícone da Categoria */}
+                        <div className="hidden sm:flex flex-shrink-0 w-10 h-10 rounded-2xl bg-gray-50 dark:bg-white/5 border border-black/5 dark:border-white/5 items-center justify-center text-xl shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                          {icon}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-gray-800 dark:text-white group-hover:text-theme transition-colors">
+                            {t.description}
+                          </span>
+                          <span className="text-[9px] font-black text-gray-400 dark:text-gray-600 sm:hidden uppercase tracking-widest mt-0.5 flex items-center gap-1">
+                            <span className="text-xs">{icon}</span> {label}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 hidden sm:table-cell text-center">
+                      <span className="inline-flex items-center px-3 py-1 bg-gray-100 dark:bg-white/5 rounded-full text-[9px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-tighter">
+                        {label}
                       </span>
-                      <span className="text-[9px] font-black text-gray-400 dark:text-gray-600 sm:hidden uppercase tracking-widest mt-0.5">
-                        {tTr.categories[t.category]}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 hidden sm:table-cell text-center">
-                    <span className="inline-flex items-center px-3 py-1 bg-gray-100 dark:bg-white/5 rounded-full text-[9px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-tighter">
-                      {tTr.categories[t.category]}
-                    </span>
-                  </td>
-                  <td className={`px-6 py-4 text-sm font-black text-right tabular-nums ${t.type === TransactionType.INCOME ? 'text-emerald-500' : 'text-rose-500'}`}>
-                    {t.type === TransactionType.INCOME ? '+' : '-'} {formatCurrency(t.amount)}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                      <button 
-                        onClick={() => onEdit(t)} 
-                        className="text-gray-400 hover:text-theme dark:hover:text-white transition-all p-2 hover:bg-theme/10 dark:hover:bg-theme rounded-xl"
-                        title="Editar"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                      </button>
-                      <button 
-                        onClick={() => confirm(language === 'pt' ? 'Remover este registro?' : 'Remove this record?') && onDelete(t.id)} 
-                        className="text-gray-400 hover:text-rose-500 transition-all p-2 hover:bg-rose-50 dark:hover:bg-rose-500/20 rounded-xl"
-                        title="Excluir"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                    </td>
+                    <td className={`px-6 py-4 text-sm font-black text-right tabular-nums ${t.type === TransactionType.INCOME ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      {t.type === TransactionType.INCOME ? '+' : '-'} {formatCurrency(t.amount)}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                        <button 
+                          onClick={() => onEdit(t)} 
+                          className="text-gray-400 hover:text-theme dark:hover:text-white transition-all p-2 hover:bg-theme/10 dark:hover:bg-theme rounded-xl"
+                          title="Editar"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                        </button>
+                        <button 
+                          onClick={() => confirm(language === 'pt' ? 'Remover este registro?' : 'Remove this record?') && onDelete(t.id)} 
+                          className="text-gray-400 hover:text-rose-500 transition-all p-2 hover:bg-rose-50 dark:hover:bg-rose-500/20 rounded-xl"
+                          title="Excluir"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

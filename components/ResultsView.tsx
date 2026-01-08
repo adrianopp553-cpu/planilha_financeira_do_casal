@@ -35,13 +35,11 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
       currency: language === 'pt' ? 'BRL' : 'USD' 
     }).format(val);
 
-  // Filtro de Transações do Último Mês (30 dias) para o PDF
   const lastMonthTransactions = useMemo(() => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
     return transactions.filter(t => {
-      // Converte string DD/MM/AAAA para objeto Date
       const [day, month, year] = t.date.split('/').map(Number);
       const txDate = new Date(year, month - 1, day);
       return txDate >= thirtyDaysAgo;
@@ -84,117 +82,106 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
   return (
     <main className="pt-24 pb-32 px-6 max-w-7xl mx-auto animate-in fade-in duration-500">
       
-      {/* SEÇÃO DE IMPRESSÃO (PDF) - REESTRUTURADA */}
-      <div className="hidden print:block w-full text-slate-900 bg-white font-sans">
-        <div className="flex justify-between items-start border-b-[8px] border-theme pb-8 mb-8">
+      {/* SEÇÃO DE IMPRESSÃO (PDF) - Otimizada para fundo branco */}
+      <div className="hidden print:block w-full text-slate-900 bg-white font-sans p-4">
+        <div className="flex justify-between items-start border-b-4 border-theme pb-6 mb-8">
           <div className="flex items-center gap-6">
             <div className="text-theme">
-              <FCLogo className="w-16 h-16" />
+              <FCLogo className="w-14 h-14" />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-theme tracking-tighter uppercase">Relatório Financeiro Estratégico</h1>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Audit Log • Pro Edition v2.5</p>
+              <h1 className="text-2xl font-black text-theme tracking-tighter uppercase">Relatório Financeiro Estratégico</h1>
+              <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Audit Log • Pro Edition v2.5</p>
             </div>
           </div>
           <div className="text-right">
-             <p className="text-2xl font-black tabular-nums text-theme">{new Date().toLocaleDateString()}</p>
-             <p className="text-[8px] font-black uppercase text-theme mt-1">Status: Consolidado</p>
+             <p className="text-xl font-black tabular-nums text-theme leading-none">{new Date().toLocaleDateString()}</p>
+             <p className="text-[7px] font-black uppercase text-theme mt-1">Status: Consolidado</p>
           </div>
         </div>
 
-        {/* Resumo Financeiro PDF */}
-        <div className="grid grid-cols-3 gap-4 mb-10">
-          <div className="p-6 rounded-[24px] border border-emerald-100 bg-emerald-50/20">
-            <p className="text-[8px] font-black uppercase tracking-widest text-emerald-600 mb-1">Créditos</p>
-            <p className="text-2xl font-black text-emerald-600 tabular-nums">{formatCurrency(summary.totalIncome)}</p>
+        {/* Resumo PDF com fundo branco e bordas */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="p-4 rounded-xl border-2 border-emerald-100 bg-emerald-50/10">
+            <p className="text-[7px] font-black uppercase tracking-widest text-emerald-600 mb-1">Créditos</p>
+            <p className="text-xl font-black text-emerald-600 tabular-nums">{formatCurrency(summary.totalIncome)}</p>
           </div>
-          <div className="p-6 rounded-[24px] border border-rose-100 bg-rose-50/20">
-            <p className="text-[8px] font-black uppercase tracking-widest text-rose-500 mb-1">Débitos</p>
-            <p className="text-2xl font-black text-rose-500 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
+          <div className="p-4 rounded-xl border-2 border-rose-100 bg-rose-50/10">
+            <p className="text-[7px] font-black uppercase tracking-widest text-rose-500 mb-1">Débitos</p>
+            <p className="text-xl font-black text-rose-500 tabular-nums">{formatCurrency(summary.totalExpense)}</p>
           </div>
-          <div className="p-6 rounded-[24px] bg-slate-900 text-white shadow-xl shadow-slate-200">
-            <p className="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1">Disponível</p>
-            <p className="text-2xl font-black tabular-nums">{formatCurrency(summary.balance)}</p>
+          <div className="p-4 rounded-xl border-2 border-slate-900 bg-white">
+            <p className="text-[7px] font-black uppercase tracking-widest text-slate-400 mb-1">Saldo Líquido</p>
+            <p className="text-xl font-black text-slate-900 tabular-nums">{formatCurrency(summary.balance)}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-8 mb-12">
-          <div className="col-span-7 bg-slate-50 p-8 rounded-[32px] border border-slate-200">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-900 mb-6 border-l-4 border-theme pl-4">Distribuição Analítica</h2>
+        <div className="grid grid-cols-12 gap-6 mb-10">
+          <div className="col-span-7 bg-white p-6 rounded-2xl border-2 border-slate-100">
+            <h2 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-900 mb-4 border-l-4 border-theme pl-3">Distribuição Analítica</h2>
             <Suspense fallback={null}>
               <FinancialCharts transactions={transactions} language={language} />
             </Suspense>
           </div>
 
-          <div className="col-span-5 bg-slate-900 p-8 rounded-[32px]">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-8 border-l-4 border-theme pl-4">Maiores Ofensores</h2>
-            <div className="space-y-3">
+          <div className="col-span-5 bg-white p-6 rounded-2xl border-2 border-slate-900">
+            <h2 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-900 mb-6 border-l-4 border-theme pl-3">Maiores Ofensores</h2>
+            <div className="space-y-2.5">
               {topExpenses.map((t, idx) => (
-                <div key={t.id} className="w-full bg-white rounded-[20px] p-4 flex items-center justify-between border border-transparent shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 flex items-center justify-center bg-slate-900 text-white rounded-lg font-black text-[10px]">0{idx+1}</div>
+                <div key={t.id} className="w-full bg-slate-50 rounded-lg p-3 flex items-center justify-between border border-slate-200">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-6 h-6 flex items-center justify-center bg-slate-900 text-white rounded font-black text-[9px]">0{idx+1}</div>
                     <div>
-                      <p className="text-[10px] font-black text-slate-900 uppercase tracking-tight leading-none mb-0.5">{t.description}</p>
-                      <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">{t.category}</p>
+                      <p className="text-[9px] font-black text-slate-900 uppercase leading-none mb-0.5">{t.description}</p>
+                      <p className="text-[6px] font-black text-slate-400 uppercase tracking-widest">{t.category}</p>
                     </div>
                   </div>
-                  <p className="text-xs font-black text-rose-600 tabular-nums pr-1">{formatCurrency(t.amount)}</p>
+                  <p className="text-[10px] font-black text-rose-600 tabular-nums">{formatCurrency(t.amount)}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* HISTÓRICO MENSAL - NOVIDADE PDF */}
-        <div className="mb-12 page-break-before">
-           <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-900 mb-6 border-l-4 border-theme pl-4">Histórico Operacional (Últimos 30 dias)</h2>
-           <div className="border border-slate-100 rounded-[24px] overflow-hidden">
-             <table className="w-full text-left text-[9px] border-collapse">
+        <div className="mb-10 page-break-before">
+           <h2 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-900 mb-4 border-l-4 border-theme pl-3">Histórico Mensal</h2>
+           <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
+             <table className="w-full text-left text-[8px] border-collapse">
                <thead>
-                 <tr className="bg-slate-50 border-b border-slate-100">
-                   <th className="py-4 px-6 font-black uppercase tracking-wider text-slate-400">Data</th>
-                   <th className="py-4 px-6 font-black uppercase tracking-wider text-slate-400">Descrição</th>
-                   <th className="py-4 px-6 font-black uppercase tracking-wider text-slate-400">Categoria</th>
-                   <th className="py-4 px-6 font-black uppercase tracking-wider text-slate-400 text-right">Valor</th>
+                 <tr className="bg-slate-100 border-b border-slate-200">
+                   <th className="py-2 px-4 font-black uppercase text-slate-500">Data</th>
+                   <th className="py-2 px-4 font-black uppercase text-slate-500">Descrição</th>
+                   <th className="py-2 px-4 font-black uppercase text-slate-500">Cat.</th>
+                   <th className="py-2 px-4 font-black uppercase text-slate-500 text-right">Valor</th>
                  </tr>
                </thead>
-               <tbody className="divide-y divide-slate-50">
-                 {lastMonthTransactions.length === 0 ? (
-                   <tr>
-                     <td colSpan={4} className="py-10 text-center text-slate-400 font-bold uppercase tracking-widest">Nenhuma transação no período.</td>
+               <tbody className="divide-y divide-slate-100">
+                 {lastMonthTransactions.map((tx) => (
+                   <tr key={tx.id}>
+                     <td className="py-2 px-4 font-bold text-slate-400 tabular-nums">{tx.date}</td>
+                     <td className="py-2 px-4 font-black text-slate-800 uppercase">{tx.description}</td>
+                     <td className="py-2 px-4 text-[7px] font-black text-slate-400 uppercase">{tx.category}</td>
+                     <td className={`py-2 px-4 text-right font-black tabular-nums ${tx.type === TransactionType.INCOME ? 'text-emerald-600' : 'text-rose-600'}`}>
+                       {tx.type === TransactionType.INCOME ? '+' : '-'} {formatCurrency(tx.amount)}
+                     </td>
                    </tr>
-                 ) : (
-                   lastMonthTransactions.map((tx) => (
-                     <tr key={tx.id} className="hover:bg-slate-50/50">
-                       <td className="py-3 px-6 font-bold text-slate-500 tabular-nums">{tx.date}</td>
-                       <td className="py-3 px-6 font-black text-slate-900 uppercase">{tx.description}</td>
-                       <td className="py-3 px-6">
-                         <span className="text-[8px] font-black px-2 py-0.5 bg-slate-100 rounded text-slate-400 uppercase">{tx.category}</span>
-                       </td>
-                       <td className={`py-3 px-6 text-right font-black tabular-nums ${tx.type === TransactionType.INCOME ? 'text-emerald-600' : 'text-rose-600'}`}>
-                         {tx.type === TransactionType.INCOME ? '+' : '-'} {formatCurrency(tx.amount)}
-                       </td>
-                     </tr>
-                   ))
-                 )}
+                 ))}
                </tbody>
              </table>
            </div>
         </div>
 
-        {/* CONSELHO DE EVOLUÇÃO - NOVIDADE PDF */}
-        <div className="mt-12 pt-10 border-t-2 border-slate-100 text-center flex flex-col items-center">
-           <div className="w-12 h-12 bg-theme/10 rounded-2xl flex items-center justify-center text-theme mb-4">
-             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        {/* CONSELHO EM BRANCO - ÁREA LIMPA PARA NOTAS OU REFLEXÃO */}
+        <div className="mt-8 pt-8 border-t-2 border-slate-100 text-center flex flex-col items-center bg-white">
+           <div className="w-10 h-10 border-2 border-theme rounded-xl flex items-center justify-center text-theme mb-3">
+             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
              </svg>
            </div>
-           <p className="text-[10px] font-black text-theme uppercase tracking-[0.5em] mb-3">Mindset de Prosperidade</p>
-           <p className="text-lg font-black tracking-tight text-slate-900 max-w-xl italic leading-snug">
-             "A disciplina financeira é a ponte entre seus objetivos e a sua liberdade. Continue monitorando, ajustando e evoluindo."
-           </p>
-           <div className="mt-8 w-20 h-1 bg-theme/20 rounded-full"></div>
-           <p className="mt-6 text-[8px] font-bold text-slate-300 uppercase tracking-widest italic">Gerado automaticamente por FinControl Pro AI Analytics</p>
+           <p className="text-[9px] font-black text-theme uppercase tracking-[0.4em] mb-2">Mindset de Prosperidade</p>
+           {/* Dica deixada em branco conforme solicitado */}
+           <div className="h-12 w-full max-w-xl border-b border-dashed border-slate-200 mb-4"></div>
+           <p className="text-[7px] font-bold text-slate-300 uppercase tracking-widest italic">Análise de Evolução • FinControl Pro v2.5</p>
         </div>
       </div>
 

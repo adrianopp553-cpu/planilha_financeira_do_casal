@@ -1,16 +1,16 @@
 
 import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react';
-import { Transaction, FinancialSummary, AppSettings } from './types';
-import { translations } from './translations';
-import SummaryCards from './components/SummaryCards';
-import TransactionForm from './components/TransactionForm';
-import TransactionTable from './components/TransactionTable';
+import { Transaction, FinancialSummary, AppSettings } from './types.ts';
+import { translations } from './translations.ts';
+import SummaryCards from './components/SummaryCards.tsx';
+import TransactionForm from './components/TransactionForm.tsx';
+import TransactionTable from './components/TransactionTable.tsx';
 
-const FinancialCharts = lazy(() => import('./components/FinancialCharts'));
-const AIAssistant = lazy(() => import('./components/AIAssistant'));
-const ResultsView = lazy(() => import('./components/ResultsView'));
-const SettingsView = lazy(() => import('./components/SettingsView'));
-const AboutSection = lazy(() => import('./components/AboutSection'));
+const FinancialCharts = lazy(() => import('./components/FinancialCharts.tsx'));
+const AIAssistant = lazy(() => import('./components/AIAssistant.tsx'));
+const ResultsView = lazy(() => import('./components/ResultsView.tsx'));
+const SettingsView = lazy(() => import('./components/SettingsView.tsx'));
+const AboutSection = lazy(() => import('./components/AboutSection.tsx'));
 
 const FCLogo = ({ className = "h-6 w-6" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -184,7 +184,6 @@ const App: React.FC = () => {
                 </div>
               </main>
 
-              {/* Seção Sobre o Ecossistema movida para o final da página */}
               <AboutSection language={settings.language} lightMode={settings.lightMode} />
             </div>
           ) : view === 'results' ? (
