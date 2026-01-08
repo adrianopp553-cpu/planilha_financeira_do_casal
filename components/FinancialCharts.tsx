@@ -53,8 +53,26 @@ const FinancialCharts: React.FC<FinancialChartsProps> = ({ transactions, languag
 
   return (
     <div className="flex flex-col h-full animate-in fade-in duration-700">
-      {/* Legenda Estruturada no Topo */}
-      <div className="grid grid-cols-2 gap-3 mb-10 max-h-48 overflow-y-auto pr-2 custom-scrollbar no-print">
+      {/* Gráfico no Topo (Original) */}
+      <div className="flex-1 min-h-[260px] relative mb-6">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie data={pieData} innerRadius={75} outerRadius={100} paddingAngle={8} dataKey="value" stroke="none" animationDuration={1500}>
+              {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} className="outline-none" />)}
+            </Pie>
+            <Tooltip 
+              contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', background: '#fff' }} 
+              itemStyle={{ fontWeight: '900', fontSize: '12px' }} 
+              formatter={(value: number) => formatCurrency(value)} 
+            />
+            <text x="50%" y="48%" textAnchor="middle" dominantBaseline="middle" className="font-black" style={{ fontSize: '36px', fill: primaryColor }}>{expenseRatio}%</text>
+            <text x="50%" y="60%" textAnchor="middle" dominantBaseline="middle" className="fill-slate-400 font-black uppercase tracking-[0.4em]" style={{ fontSize: '9px' }}>{language === 'pt' ? 'Impacto' : 'Impact'}</text>
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Legenda na Base (Interface Web - No Print) */}
+      <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar no-print">
         {pieData.map((entry, index) => (
           <div key={entry.name} className="flex flex-col p-4 bg-black/5 dark:bg-white/[0.03] rounded-2xl border border-transparent hover:border-theme/20 transition-all group">
             <div className="flex items-center gap-2 mb-2">
@@ -69,22 +87,20 @@ const FinancialCharts: React.FC<FinancialChartsProps> = ({ transactions, languag
         ))}
       </div>
 
-      {/* Gráfico de Donut */}
-      <div className="flex-1 min-h-[260px] relative">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie data={pieData} innerRadius={75} outerRadius={100} paddingAngle={8} dataKey="value" stroke="none" animationDuration={1500} animationBegin={200}>
-              {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} className="outline-none" />)}
-            </Pie>
-            <Tooltip 
-              contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', background: '#fff' }} 
-              itemStyle={{ fontWeight: '900', fontSize: '12px' }} 
-              formatter={(value: number) => formatCurrency(value)} 
-            />
-            <text x="50%" y="48%" textAnchor="middle" dominantBaseline="middle" className="font-black" style={{ fontSize: '36px', fill: primaryColor }}>{expenseRatio}%</text>
-            <text x="50%" y="60%" textAnchor="middle" dominantBaseline="middle" className="fill-slate-400 font-black uppercase tracking-[0.4em]" style={{ fontSize: '9px' }}>{language === 'pt' ? 'Impacto' : 'Impact'}</text>
-          </PieChart>
-        </ResponsiveContainer>
+      {/* Versão simplificada para Impressão (Aparecerá no PDF) */}
+      <div className="hidden print:block space-y-2 mt-4">
+        {pieData.slice(0, 10).map((entry, index) => (
+          <div key={entry.name} className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }}></div>
+              <span className="text-[10px] font-black uppercase text-slate-800 tracking-tight">{entry.name}</span>
+            </div>
+            <div className="flex items-center gap-6">
+               <span className="text-[9px] font-bold text-slate-400">{Math.round((entry.value / totalExpense) * 100)}%</span>
+               <span className="text-[10px] font-black text-theme tabular-nums">{formatCurrency(entry.value)}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

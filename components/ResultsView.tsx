@@ -67,7 +67,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
   return (
     <main className="pt-32 pb-40 px-6 max-w-7xl mx-auto animate-in fade-in duration-700">
       
-      {/* SEÇÃO DE IMPRESSÃO - LAYOUT TÉCNICO PREMIUM */}
+      {/* SEÇÃO DE IMPRESSÃO (PDF) - Otimizada conforme solicitado anteriormente */}
       <div className="hidden print:block w-full text-slate-900 bg-white font-sans">
         <div className="flex justify-between items-start border-b-[12px] border-theme pb-10 mb-10">
           <div className="flex items-center gap-8">
@@ -85,6 +85,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
           </div>
         </div>
 
+        {/* Resumo PDF */}
         <div className="grid grid-cols-3 gap-6 mb-12">
           <div className="p-8 rounded-[32px] border-2 border-emerald-100 bg-emerald-50/30">
             <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600 mb-2">Créditos</p>
@@ -102,7 +103,8 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
 
         <div className="grid grid-cols-12 gap-10">
           <div className="col-span-7 bg-slate-50 p-10 rounded-[48px] border border-slate-200">
-            <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-900 mb-10 border-l-4 border-theme pl-4">Distribuição Analítica</h2>
+            <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-900 mb-6 border-l-4 border-theme pl-4">Distribuição Analítica</h2>
+            {/* O FinancialCharts agora coloca a legenda no topo automaticamente no print */}
             <Suspense fallback={null}>
               <FinancialCharts transactions={transactions} language={language} />
             </Suspense>
@@ -128,7 +130,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
         </div>
       </div>
 
-      {/* INTERFACE WEB - DESIGN PREMIUM */}
+      {/* INTERFACE WEB (NO-PRINT) */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-16 gap-6 no-print">
         <div>
           <button onClick={onBack} className="flex items-center gap-2 text-theme font-black text-[10px] uppercase tracking-widest mb-4 hover:gap-3 transition-all">
@@ -141,7 +143,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
         <div className="flex gap-4">
           <button onClick={handleExportPDF} className="px-8 py-5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-white/80 hover:bg-slate-50 transition-all flex items-center gap-3">
              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-             PDF
+             Exportar PDF
           </button>
           <button onClick={() => window.print()} className="px-8 py-5 bg-theme text-black rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-theme/30 hover:scale-105 transition-all flex items-center gap-3">
              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2" /></svg>
@@ -154,7 +156,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
         <SummaryCards summary={summary} language={language} />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Distribuição de Gastos */}
+          {/* Distribuição de Gastos (Web) - Legenda volta para baixo */}
           <div className={`lg:col-span-7 ${cardBg} p-12 rounded-[56px] shadow-sm border border-slate-200 dark:border-white/10`}>
             <h2 className={`text-2xl font-black mb-12 ${themeOrWhite}`}>Distribuição de Gastos</h2>
             <Suspense fallback={null}>
@@ -162,14 +164,14 @@ const ResultsView: React.FC<ResultsViewProps> = ({ transactions, summary, onBack
             </Suspense>
           </div>
 
-          {/* Maiores Saídas - Cards Brancos Perfeitos */}
+          {/* Maiores Saídas (Web) - Revertido para o design original (Cartões translúcidos) */}
           <div className={`lg:col-span-5 ${cardBg} p-12 rounded-[56px] shadow-sm border border-slate-200 dark:border-white/10`}>
              <h2 className={`text-2xl font-black mb-12 ${themeOrWhite}`}>Maiores Saídas</h2>
              <div className="space-y-4">
                {topExpenses.map((t, idx) => (
-                 <div key={t.id} className="flex items-center justify-between p-6 bg-white dark:bg-white/10 rounded-[32px] border border-black/[0.03] dark:border-white/10 shadow-sm transition-all hover:translate-x-2">
+                 <div key={t.id} className="flex items-center justify-between p-6 bg-black/5 dark:bg-white/5 rounded-[32px] border border-transparent hover:border-theme/30 transition-all hover:translate-x-2 group">
                     <div className="flex items-center gap-5">
-                      <div className="w-12 h-12 bg-theme/10 rounded-2xl flex items-center justify-center font-black text-theme text-sm">0{idx + 1}</div>
+                      <div className="w-12 h-12 bg-theme/10 rounded-2xl flex items-center justify-center font-black text-theme text-sm group-hover:bg-theme group-hover:text-black transition-colors">0{idx + 1}</div>
                       <div>
                         <p className={`font-black text-sm uppercase tracking-tight ${!lightMode ? 'text-white' : 'text-slate-900'}`}>{t.description}</p>
                         <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-1">{t.category}</p>
