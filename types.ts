@@ -48,4 +48,5 @@ export interface AppSettings {
   lightMode: boolean;
   fontSize: 'small' | 'medium' | 'large';
   fontFamily: 'sans' | 'serif' | 'inter';
+  securityPin?: string; // PIN de 4 dígitos para bloqueio
 }
